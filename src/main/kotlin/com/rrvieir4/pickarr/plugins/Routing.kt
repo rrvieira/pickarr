@@ -1,9 +1,11 @@
 package com.rrvieir4.pickarr.plugins
 
-import com.rrvieir4.pickarr.clients.common.Response
-import com.rrvieir4.pickarr.clients.servarr.radarr.RadarrClient
-import com.rrvieir4.pickarr.clients.servarr.sonarr.SonarrClient
+import com.rrvieir4.pickarr.services.clients.Response
+import com.rrvieir4.pickarr.services.clients.servarr.radarr.RadarrClient
+import com.rrvieir4.pickarr.services.clients.servarr.sonarr.SonarrClient
 import com.rrvieir4.pickarr.config.Config
+import com.rrvieir4.pickarr.services.servarr.radarr.RadarrService
+import com.rrvieir4.pickarr.services.servarr.sonarr.SonarrService
 import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -21,11 +23,11 @@ fun Application.configureRouting() {
             val config = Config.setupFromEnv() ?: return@get call.respond(HttpStatusCode.InternalServerError)
 
             val httpClient = getHttpClient()
-            val radarrClient = RadarrClient(config.radarrConfig, httpClient)
+            val radarrService = RadarrService(config.radarrConfig, httpClient)
 
-            when (val addMovieResponse = radarrClient.addMovieWithImdbId(imdbId)) {
+            when (val addMovieResponse = radarrService.saveMovie(imdbId)) {
                 is Response.Success -> call.respondRedirect(
-                    radarrClient.getWebDetailsUrlForMovie(addMovieResponse.body.tmdbId),
+                    radarrService.getWebDetailsUrlForMovie(addMovieResponse.body.tmdbId),
                     false
                 )
                 is Response.Failure -> call.respond(HttpStatusCode.InternalServerError, "Internal server error")
@@ -39,11 +41,11 @@ fun Application.configureRouting() {
             val config = Config.setupFromEnv() ?: return@get call.respond(HttpStatusCode.InternalServerError)
 
             val httpClient = getHttpClient()
-            val sonarrClient = SonarrClient(config.sonarrConfig, httpClient)
+            val sonarrService = SonarrService(config.sonarrConfig, httpClient)
 
-            when (val addTVResponse = sonarrClient.addSerieWithImdbId(imdbId)) {
+            when (val addTVResponse = sonarrService.saveTV(imdbId)) {
                 is Response.Success -> call.respondRedirect(
-                    sonarrClient.getWebDetailsUrlForTVSeries(addTVResponse.body.titleSlug),
+                    sonarrService.getWebDetailsUrlForTVSeries(addTVResponse.body.titleSlug),
                     false
                 )
                 is Response.Failure -> call.respond(HttpStatusCode.InternalServerError, "Internal server error")

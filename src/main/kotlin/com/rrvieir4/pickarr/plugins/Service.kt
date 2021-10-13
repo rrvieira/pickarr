@@ -1,13 +1,15 @@
 package com.rrvieir4.pickarr.plugins
 
-import com.rrvieir4.pickarr.clients.common.Response
-import com.rrvieir4.pickarr.clients.notification.telegram.TelegramClient
-import com.rrvieir4.pickarr.clients.popularmedia.MediaClient
-import com.rrvieir4.pickarr.clients.popularmedia.imdb.ImdbClient
-import com.rrvieir4.pickarr.clients.servarr.radarr.RadarrClient
-import com.rrvieir4.pickarr.clients.servarr.sonarr.SonarrClient
-import com.rrvieir4.pickarr.clients.storage.DBClient
+import com.rrvieir4.pickarr.services.clients.Response
+import com.rrvieir4.pickarr.services.notification.telegram.TelegramClient
+import com.rrvieir4.pickarr.services.popular.PopularService
+import com.rrvieir4.pickarr.services.clients.servarr.radarr.RadarrClient
+import com.rrvieir4.pickarr.services.clients.servarr.sonarr.SonarrClient
+import com.rrvieir4.pickarr.services.storage.DBClient
 import com.rrvieir4.pickarr.config.Config
+import com.rrvieir4.pickarr.services.popular.sources.ImdbService
+import com.rrvieir4.pickarr.services.servarr.radarr.RadarrService
+import com.rrvieir4.pickarr.services.servarr.sonarr.SonarrService
 import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -37,11 +39,11 @@ fun Application.launchPickarrService() {
             "http://127.0.0.1:8080"
         )
 
-        val mediaClient: MediaClient = ImdbClient(httpClient)
-        val popularMoviesResponse = mediaClient.fetchPopularMovies()
-        val popularTVResponse = mediaClient.fetchPopularTV()
+        val popularService: PopularService = ImdbService(httpClient)
+        val popularMoviesResponse = popularService.fetchPopularMovies()
+        val popularTVResponse = popularService.fetchPopularTV()
 
-        val movieItemsResponse = RadarrClient(config.radarrConfig, httpClient).getExistingMovies()
+        val movieItemsResponse = RadarrService(config.radarrConfig, httpClient).getMovies()
         if (popularMoviesResponse is Response.Success && movieItemsResponse is Response.Success) {
             val popularMovies = popularMoviesResponse.body
             val existingMovies = movieItemsResponse.body
@@ -53,7 +55,7 @@ fun Application.launchPickarrService() {
                         popularMovie.rating >= config.movieRequirements.minRating &&
                         popularMovie.totalVotes >= config.movieRequirements.minVotes &&
                         suggestedMediaList.find { suggestedMedia ->
-                            popularMovie.imdbId == suggestedMedia.imdbId
+                            popularMovie.id == suggestedMedia.imdbId
                         } == null
             }
 
@@ -62,7 +64,7 @@ fun Application.launchPickarrService() {
             telegramClient.notifyNewMovies(suggestionList.sortedDescending())
         }
 
-        val tvItemsResponse = SonarrClient(config.sonarrConfig, httpClient).getExistingMedia()
+        val tvItemsResponse = SonarrService(config.sonarrConfig, httpClient).getTVShows()
         if (popularTVResponse is Response.Success && tvItemsResponse is Response.Success) {
             val popularTV = popularTVResponse.body
             val existingTV = tvItemsResponse.body
@@ -74,7 +76,7 @@ fun Application.launchPickarrService() {
                         popularTV.rating >= config.tvRequirements.minRating &&
                         popularTV.totalVotes >= config.tvRequirements.minVotes &&
                         suggestedMediaList.find { suggestedMedia ->
-                            popularTV.imdbId == suggestedMedia.imdbId
+                            popularTV.id == suggestedMedia.imdbId
                         } == null
             }
 

@@ -2,3 +2,4 @@ build/
 .gradle/
 .idea/
 docker-compose.yml
+pickarr.log
