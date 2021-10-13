@@ -1,7 +1,10 @@
 val ktorVersion: String by project
 val kotlinVersion: String by project
 val logbackVersion: String by project
-val jsoupVersion : String by project
+val jsoupVersion: String by project
+val kmongoVersion: String by project
+val kapacheCommonsVersion: String by project
+val ktelegrambotVersion: String by project
 
 plugins {
     application
@@ -16,6 +19,9 @@ application {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://jitpack.io")
+    }
 }
 
 dependencies {
@@ -26,7 +32,11 @@ dependencies {
     implementation("io.ktor:ktor-client-gson:$ktorVersion")
     implementation("io.ktor:ktor-client-logging:$ktorVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation ("org.jsoup:jsoup:$jsoupVersion")
+    implementation("org.jsoup:jsoup:$jsoupVersion")
+    implementation("org.litote.kmongo:kmongo:$kmongoVersion")
+    implementation("org.litote.kmongo:kmongo-coroutine:$kmongoVersion")
+    implementation("org.apache.commons:commons-text:$kapacheCommonsVersion")
+    implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:$ktelegrambotVersion")
     testImplementation("io.ktor:ktor-server-tests:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
 }
