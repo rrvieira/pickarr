@@ -1,37 +1,29 @@
 package com.rrvieir4.pickarr.services.servarr.radarr
 
 import com.rrvieir4.pickarr.config.Config.ServarrConfig
-import com.rrvieir4.pickarr.services.clients.ClientError
+import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
 import com.rrvieir4.pickarr.services.clients.servarr.models.Tag
 import com.rrvieir4.pickarr.services.clients.servarr.radarr.RadarrClient
 import com.rrvieir4.pickarr.services.clients.servarr.radarr.models.MovieAddOptions
-import com.rrvieir4.pickarr.services.clients.servarr.radarr.models.MovieItem
+import com.rrvieir4.pickarr.services.clients.servarr.radarr.models.RadarrItem
+import com.rrvieir4.pickarr.services.servarr.ServarrService
 import io.ktor.client.*
 
-class RadarrService(private val config: ServarrConfig, httpClient: HttpClient) {
+class RadarrService(private val config: ServarrConfig, httpClient: HttpClient) : ServarrService<RadarrItem> {
 
     private val radarrClient = RadarrClient(config.url, config.apiKey, httpClient)
 
-    fun getWebDetailsUrlForMovie(tmdbId: Int) = MOVIE_WEB_DETAILS_URL_TEMPLATE.format(config.url, tmdbId)
+    override fun getItemDetailWebpageUrl(item: RadarrItem): String =
+        MOVIE_WEB_DETAILS_URL_TEMPLATE.format(config.url, item.tmdbId)
 
-    suspend fun getMovies(): Response<List<MovieItem>, ClientError> = radarrClient.getExistingMovies()
+    override suspend fun getItems(): Response<List<RadarrItem>, PickarrError> = radarrClient.getExistingMovies()
 
-    suspend fun saveMovie(imdbId: String): Response<MovieItem, ClientError> {
-        return when (val moviesResponse = radarrClient.getExistingMovies()) {
-            is Response.Success -> {
-                val existingMovie = moviesResponse.body.find { it.imdbId == imdbId }
-                if (existingMovie == null) {
-                    addMovie(imdbId)
-                } else {
-                    Response.Success(existingMovie)
-                }
-            }
-            is Response.Failure -> moviesResponse
-        }
-    }
+    override suspend fun getTags(): Response<List<Tag>, PickarrError> = radarrClient.getTags()
 
-    private suspend fun addMovie(imdbId: String): Response<MovieItem, ClientError> {
+    override suspend fun addTag(tagName: String): Response<Tag, PickarrError> = radarrClient.addTag(tagName)
+
+    override suspend fun addItem(imdbId: String): Response<RadarrItem, PickarrError> {
         val rootFolderResponse = radarrClient.getRootFolders()
         val qualityProfileResponse = radarrClient.getQualityProfiles()
         val movieToAddResponse = radarrClient.lookupMovieWithImdbId(imdbId)
@@ -43,7 +35,7 @@ class RadarrService(private val config: ServarrConfig, httpClient: HttpClient) {
             tagResponse is Response.Success
         ) {
             val qualityProfile = qualityProfileResponse.body.find { it.name == config.qualityProfileName }
-                ?: return Response.Failure(ClientError.GenericError("Quality Profile does not exist: ${config.qualityProfileName}"))
+                ?: return Response.Failure(PickarrError.GenericError("Quality Profile does not exist: ${config.qualityProfileName}"))
 
             val movieBody = movieToAddResponse.body.first().copy(
                 rootFolderPath = rootFolderResponse.body.first().path,
@@ -55,24 +47,12 @@ class RadarrService(private val config: ServarrConfig, httpClient: HttpClient) {
 
             radarrClient.addMovie(movieBody)
         } else {
-            Response.Failure(ClientError.ApiError("Preparation to add movie failed"))
+            Response.Failure(PickarrError.ApiError("Preparation to add movie failed"))
         }
     }
 
-    private suspend fun saveTag(tagName: String): Response<Tag, ClientError> {
-        return when (val tagsResponse = radarrClient.getTags()) {
-            is Response.Success -> {
-                val existingTag = tagsResponse.body.find { it.label == tagName }
-                if (existingTag == null) {
-                    radarrClient.addTag(tagName)
-                } else {
-                    Response.Success(existingTag)
-                }
-            }
-            is Response.Failure -> tagsResponse
-        }
-    }
-
+    override suspend fun lookupItemWithImdbId(imdbId: String): Response<List<RadarrItem>, PickarrError> =
+        radarrClient.lookupMovieWithImdbId(imdbId)
 
     private companion object {
         const val MOVIE_WEB_DETAILS_URL_TEMPLATE = "%s/movie/%s"

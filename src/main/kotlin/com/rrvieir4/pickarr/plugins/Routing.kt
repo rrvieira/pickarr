@@ -25,9 +25,9 @@ fun Application.configureRouting() {
             val httpClient = getHttpClient()
             val radarrService = RadarrService(config.radarrConfig, httpClient)
 
-            when (val addMovieResponse = radarrService.saveMovie(imdbId)) {
+            when (val addMovieResponse = radarrService.saveItem(imdbId)) {
                 is Response.Success -> call.respondRedirect(
-                    radarrService.getWebDetailsUrlForMovie(addMovieResponse.body.tmdbId),
+                    radarrService.getItemDetailWebpageUrl(addMovieResponse.body),
                     false
                 )
                 is Response.Failure -> call.respond(HttpStatusCode.InternalServerError, "Internal server error")
@@ -43,9 +43,9 @@ fun Application.configureRouting() {
             val httpClient = getHttpClient()
             val sonarrService = SonarrService(config.sonarrConfig, httpClient)
 
-            when (val addTVResponse = sonarrService.saveTV(imdbId)) {
+            when (val addTVResponse = sonarrService.saveItem(imdbId)) {
                 is Response.Success -> call.respondRedirect(
-                    sonarrService.getWebDetailsUrlForTVSeries(addTVResponse.body.titleSlug),
+                    sonarrService.getItemDetailWebpageUrl(addTVResponse.body),
                     false
                 )
                 is Response.Failure -> call.respond(HttpStatusCode.InternalServerError, "Internal server error")

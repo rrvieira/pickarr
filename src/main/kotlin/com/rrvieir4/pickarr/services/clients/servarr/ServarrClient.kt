@@ -1,6 +1,6 @@
 package com.rrvieir4.pickarr.services.clients.servarr
 
-import com.rrvieir4.pickarr.services.clients.ClientError
+import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
 import com.rrvieir4.pickarr.services.clients.pickarrGet
 import com.rrvieir4.pickarr.services.clients.pickarrPost
@@ -15,7 +15,7 @@ abstract class ServarrClient(protected val baseUrl: String, protected val apiKey
     protected suspend inline fun <reified R : Any> get(
         methodName: String,
         block: HttpRequestBuilder.() -> Unit = {}
-    ): Response<R, ClientError> {
+    ): Response<R, PickarrError> {
         return httpClient.pickarrGet("${apiUrl}${methodName}") {
             contentType(ContentType.Application.Json)
             parameter(API_KEY_PARAMETER, apiKey)
@@ -27,7 +27,7 @@ abstract class ServarrClient(protected val baseUrl: String, protected val apiKey
         methodName: String,
         content: B,
         block: HttpRequestBuilder.() -> Unit = {}
-    ): Response<R, ClientError> {
+    ): Response<R, PickarrError> {
         return httpClient.pickarrPost("${apiUrl}${methodName}") {
             contentType(ContentType.Application.Json)
             parameter(API_KEY_PARAMETER, apiKey)

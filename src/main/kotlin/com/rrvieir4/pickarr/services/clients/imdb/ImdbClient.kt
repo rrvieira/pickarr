@@ -1,6 +1,6 @@
 package com.rrvieir4.pickarr.services.clients.imdb
 
-import com.rrvieir4.pickarr.services.clients.ClientError
+import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
 import com.rrvieir4.pickarr.services.clients.pickarrGet
 import io.ktor.client.*
@@ -9,26 +9,26 @@ import io.ktor.http.*
 
 class ImdbClient(private val httpClient: HttpClient) {
 
-    suspend fun getPopularMovies(): Response<List<ImdbItem>, ClientError> {
+    suspend fun getPopularMovies(): Response<List<ImdbItem>, PickarrError> {
         return getPopular(POPULAR_MOVIES_URL)
     }
 
-    suspend fun getPopularTV(): Response<List<ImdbItem>, ClientError> {
+    suspend fun getPopularTV(): Response<List<ImdbItem>, PickarrError> {
         return getPopular(POPULAR_TV_URL)
     }
 
-    private suspend fun getPopular(imdbUrl: String): Response<List<ImdbItem>, ClientError> {
+    private suspend fun getPopular(imdbUrl: String): Response<List<ImdbItem>, PickarrError> {
         return when (val htmlResponse = getPopularMediaHtml(imdbUrl)) {
             is Response.Failure -> return htmlResponse
             is Response.Success -> {
                 htmlResponse.body.parseImdbMediaList(IMDB_URL)?.let {
                     Response.Success(it)
-                } ?: Response.Failure(ClientError.ParseError("Could not parse imdb html response"))
+                } ?: Response.Failure(PickarrError.ParseError("Could not parse imdb html response"))
             }
         }
     }
 
-    private suspend fun getPopularMediaHtml(url: String): Response<String, ClientError> {
+    private suspend fun getPopularMediaHtml(url: String): Response<String, PickarrError> {
         return httpClient.pickarrGet(url) {
             headers {
                 accept(ContentType.Text.Html)

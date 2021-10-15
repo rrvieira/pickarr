@@ -1,17 +1,18 @@
 package com.rrvieir4.pickarr.config
 
 data class Config(
-    val refreshInterval: Long,
+    val refreshInterval: RefreshInterval,
     val radarrConfig: ServarrConfig,
     val sonarrConfig: ServarrConfig,
     val movieRequirements: MediaRequirements,
     val tvRequirements: MediaRequirements,
     val tagName: String,
-    val telegramConfig: TelegramConfig
+    val telegramConfig: TelegramConfig,
 ) {
+    data class RefreshInterval(val default: Long, val retry: Long)
     data class ServarrConfig(val url: String, val apiKey: String, val qualityProfileName: String, val tagName: String)
     data class MediaRequirements(val minYear: Int, val minVotes: Int, val minRating: Float)
-    data class TelegramConfig(val telegramUserToken: String, val telegramChatId: Long)
+    data class TelegramConfig(val telegramUserToken: String, val telegramChatId: Long, val telegramActionUrl: String)
 
     companion object {
         private const val REFRESH_INTERVAL = "refreshInterval"
@@ -36,6 +37,9 @@ data class Config(
 
         private const val TELEGRAM_USER_TOKEN = "telegramUserToken"
         private const val TELEGRAM_CHAT_ID = "telegramChatId"
+        private const val NOTIFICATION_ACTION_URL = "actionAddress"
+
+        private const val RETRY_REFRESH_INTERVAL = 1800L
 
         private const val DEFAULT_TAG_NAME = "pickarr"
 
@@ -84,6 +88,7 @@ data class Config(
                 return null
             }
 
+            val telegramActionUrl = System.getenv(NOTIFICATION_ACTION_URL) ?: return null
             val telegramUserToken = System.getenv(TELEGRAM_USER_TOKEN) ?: return null
             val telegramChatId = try {
                 System.getenv(TELEGRAM_CHAT_ID)?.toLong() ?: return null
@@ -92,13 +97,13 @@ data class Config(
             }
 
             return Config(
-                refreshInterval,
+                RefreshInterval(refreshInterval, RETRY_REFRESH_INTERVAL),
                 ServarrConfig(radarrUrl, radarrApiKey, radarQualityProfileName, tagName),
                 ServarrConfig(sonarrUrl, sonarrApiKey, sonarrQualityProfileName, tagName),
                 MediaRequirements(movieMinYear, movieMinVotes, movieMinRating),
                 MediaRequirements(tvMinYear, tvMinVotes, tvMinRating),
                 tagName,
-                TelegramConfig(telegramUserToken, telegramChatId)
+                TelegramConfig(telegramUserToken, telegramChatId, telegramActionUrl)
             )
         }
     }

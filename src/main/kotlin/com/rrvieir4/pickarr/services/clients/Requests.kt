@@ -9,7 +9,7 @@ import io.ktor.http.*
 suspend inline fun <reified R : Any> HttpClient.pickarrGet(
     url: String,
     block: HttpRequestBuilder.() -> Unit = {}
-): Response<R, ClientError> {
+): Response<R, PickarrError> {
     return try {
         val httpResponse: HttpResponse = get(url) {
             block()
@@ -18,19 +18,19 @@ suspend inline fun <reified R : Any> HttpClient.pickarrGet(
         if (httpResponse.status == HttpStatusCode.OK) {
             Response.Success(httpResponse.receive())
         } else {
-            Response.Failure(ClientError.ApiError("Response status code not expected: ${httpResponse.status.value}. For 'get': $url"))
+            Response.Failure(PickarrError.ApiError("Response status code not expected: ${httpResponse.status.value}. For 'get': $url"))
         }
     } catch (e: NoTransformationFoundException) {
-        Response.Failure(ClientError.ParseError(e.cause?.message))
+        Response.Failure(PickarrError.ParseError(e.cause?.message))
     } catch (t: Throwable) {
-        Response.Failure(ClientError.GenericError(t.cause?.message))
+        Response.Failure(PickarrError.GenericError(t.cause?.message))
     }
 }
 
 suspend inline fun <reified R : Any> HttpClient.pickarrPost(
     url: String,
     block: HttpRequestBuilder.() -> Unit = {}
-): Response<R, ClientError> {
+): Response<R, PickarrError> {
     return try {
         val httpResponse: HttpResponse = post(url) {
             block()
@@ -39,11 +39,11 @@ suspend inline fun <reified R : Any> HttpClient.pickarrPost(
         if (httpResponse.status == HttpStatusCode.Created) {
             Response.Success(httpResponse.receive())
         } else {
-            Response.Failure(ClientError.ApiError("Response status code not expected: ${httpResponse.status.value}. For 'post': $url"))
+            Response.Failure(PickarrError.ApiError("Response status code not expected: ${httpResponse.status.value}. For 'post': $url"))
         }
     } catch (e: NoTransformationFoundException) {
-        Response.Failure(ClientError.ParseError(e.cause?.message))
+        Response.Failure(PickarrError.ParseError(e.cause?.message))
     } catch (t: Throwable) {
-        Response.Failure(ClientError.GenericError(t.cause?.message))
+        Response.Failure(PickarrError.GenericError(t.cause?.message))
     }
 }

@@ -2,9 +2,11 @@ package com.rrvieir4.pickarr.services.clients.servarr.sonarr.models
 
 import com.rrvieir4.pickarr.services.clients.servarr.models.Image
 import com.rrvieir4.pickarr.services.clients.servarr.models.Rating
+import com.rrvieir4.pickarr.services.clients.servarr.models.ServarrItem
+import com.rrvieir4.pickarr.services.storage.models.RecommendedItem
 
-data class TVItem(
-    val title: String,
+data class SonarrItem(
+    override val title: String,
     val sortTitle: String,
     val status: String,
     val ended: Boolean,
@@ -14,7 +16,7 @@ data class TVItem(
     val images: List<Image>,
     val remotePoster: String,
     val seasons: List<Season>,
-    val year: Int,
+    override val year: Int,
     val seasonFolder: Boolean,
     val monitored: Boolean,
     val useSceneNumbering: Boolean,
@@ -25,10 +27,10 @@ data class TVItem(
     val firstAired: String,
     val seriesType: SeriesType,
     val cleanTitle: String,
-    val imdbId: String,
+    override val imdbId: String,
     val titleSlug: String,
     val certification: String,
-    val genres: List<String>,
+    override val genres: List<String>,
     val tags: List<Int>,
     val added: String,
     val ratings: Rating?,
@@ -38,8 +40,7 @@ data class TVItem(
     val folder: String,
     val rootFolderPath: String?,
     val addOptions: TVAddOptions?
-) {
-    fun hasGenre(genre: String): Boolean {
-        return genres.firstOrNull { it.equals(genre, true) } != null
-    }
+) : ServarrItem {
+    override val from: String
+        get() = network
 }
