@@ -17,30 +17,31 @@ data class Config(
     data class ActionUrlConfig(val actionUrl: String, val addMovieMethod: String, val addTVMethod: String)
 
     companion object {
-        private const val REFRESH_INTERVAL = "refreshInterval"
+        private const val REFRESH_INTERVAL = "REFRESH_INTERVAL"
 
-        private const val RADARR_URL = "radarrUrl"
-        private const val RADARR_API_KEY = "radarrApiKey"
-        private const val RADARR_QUALITY_PROFILE_NAME = "radarrQualityProfileName"
+        private const val RADARR_URL = "RADARR_URL"
+        private const val RADARR_API_KEY = "RADARR_API_KEY"
+        private const val RADARR_QUALITY_PROFILE_NAME = "RADARR_QUALITY_PROFILE_NAME"
 
-        private const val SONARR_URL = "sonarrUrl"
-        private const val SONARR_API_KEY = "sonarrApiKey"
-        private const val SONARR_QUALITY_PROFILE_NAME = "sonarrQualityProfileName"
+        private const val SONARR_URL = "SONARR_URL"
+        private const val SONARR_API_KEY = "SONARR_API_KEY"
+        private const val SONARR_QUALITY_PROFILE_NAME = "SONARR_QUALITY_PROFILE_NAME"
 
-        private const val TAG_NAME = "tagName"
+        private const val TAG_NAME = "TAG_NAME"
 
-        private const val MOVIE_MIN_YEAR = "movieMinYear"
-        private const val MOVIE_MIN_VOTES = "movieMinVotes"
-        private const val MOVIE_MIN_RATING = "movieMinRating"
+        private const val MOVIE_MIN_YEAR = "MOVIE_MIN_YEAR"
+        private const val MOVIE_MIN_VOTES = "MOVIE_MIN_VOTES"
+        private const val MOVIE_MIN_RATING = "MOVIE_MIN_RATING"
 
-        private const val TV_MIN_YEAR = "tvMinYear"
-        private const val TV_MIN_VOTES = "tvMinVotes"
-        private const val TV_MIN_RATING = "tvMinRating"
+        private const val TV_MIN_YEAR = "TV_SHOW_MIN_YEAR"
+        private const val TV_MIN_VOTES = "TV_SHOW_MIN_VOTES"
+        private const val TV_MIN_RATING = "TV_SHOW_MIN_RATING"
 
-        private const val TELEGRAM_USER_TOKEN = "telegramUserToken"
-        private const val TELEGRAM_CHAT_ID = "telegramChatId"
+        private const val TELEGRAM_USER_TOKEN = "TELEGRAM_USER_TOKEN"
+        private const val TELEGRAM_CHAT_ID = "TELEGRAM_CHAT_ID"
 
-        private const val ACTION_URL = "actionAddress"
+        private const val ACTION_URL = "ACTION_ADDRESS"
+
         private const val ACTION_ADD_MOVIE_METHOD = "add-movie"
         private const val ACTION_ADD_TV_METHOD = "add-tv"
 

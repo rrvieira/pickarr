@@ -10,7 +10,7 @@ import kotlin.system.exitProcess
 
 fun main() {
 
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+    embeddedServer(Netty, port = 7877, host = "0.0.0.0") {
         log.info("Pickarr is booting...")
         val config = Config.setupFromEnv()
         if (config == null) {

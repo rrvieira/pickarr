@@ -8,6 +8,7 @@ data class RecommendedItem(
     @BsonId
     val id: String,
     val title: String,
+    val overview: String,
     val year: Int,
     val posterUrl: String,
     val genres: List<String>,
@@ -33,6 +34,7 @@ fun ServarrItem.toRecommendedItem(popularItem: PopularItem? = null): Recommended
         RecommendedItem(
             imdbId,
             title,
+            overview,
             year,
             posterUrl,
             genres,
@@ -42,5 +44,5 @@ fun ServarrItem.toRecommendedItem(popularItem: PopularItem? = null): Recommended
             it.totalVotes,
             it.popularityPosition
         )
-    } ?: RecommendedItem(imdbId, title, year, posterUrl, genres, from)
+    } ?: RecommendedItem(imdbId, title, overview, year, posterUrl, genres, from)
 }

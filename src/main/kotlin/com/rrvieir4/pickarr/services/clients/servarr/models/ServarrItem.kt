@@ -3,6 +3,7 @@ package com.rrvieir4.pickarr.services.clients.servarr.models
 interface ServarrItem {
     val imdbId: String
     val title: String
+    val overview: String
     val year: Int
     val images: List<Image>
     val genres: List<String>

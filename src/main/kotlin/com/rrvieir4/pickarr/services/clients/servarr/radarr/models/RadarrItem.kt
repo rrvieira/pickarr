@@ -10,7 +10,7 @@ data class RadarrItem(
     override val title: String,
     val sortTitle: String,
     val sizeOnDisk: Long,
-    val overview: String,
+    override val overview: String,
     val inCinemas: String?,
     val physicalRelease: String?,
     override val images: List<Image>,

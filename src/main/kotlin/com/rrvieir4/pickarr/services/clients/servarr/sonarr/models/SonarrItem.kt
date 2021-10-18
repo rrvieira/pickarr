@@ -10,7 +10,7 @@ data class SonarrItem(
     val sortTitle: String,
     val status: String,
     val ended: Boolean,
-    val overview: String,
+    override val overview: String,
     val network: String,
     val airTime: String,
     override val images: List<Image>,

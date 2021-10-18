@@ -67,6 +67,7 @@ class TelegramClient(
             title,
             year,
             from,
+            overview,
             rating,
             totalVotes,
             popularityPosition,
@@ -79,7 +80,8 @@ class TelegramClient(
     private companion object {
         const val MESSAGE_TITLE_TEMPLATE = "<b>%s New %s%s%s</b>"
         const val MEDIA_ITEM_TEMPLATE = """<a href="%s">&#8205;</a><a href="%s"><b>%s (%s)</b></a>
-<b>From:</b> <code>%s</code>
+<i><b>by:</b> %s</i>
+%s
 
 <b>Rating:</b> <code>%s (%s)</code>
 <b>Popularity:</b> <code>#%s</code>
