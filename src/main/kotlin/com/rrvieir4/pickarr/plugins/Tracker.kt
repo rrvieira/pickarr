@@ -15,6 +15,7 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.logging.*
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -54,8 +55,15 @@ fun Application.launchPickarrTask(config: Config) {
 
     launch {
         while (true) {
-            val trackMoviesResponse = pickarrTask.getRecommendedMovies()
-            val trackTVShowsResponse = pickarrTask.getRecommendedTVShows()
+            val trackMoviesDeferred = async {
+                pickarrTask.getRecommendedMovies()
+            }
+            val trackTVShowsDeferred = async {
+                pickarrTask.getRecommendedTVShows()
+            }
+
+            val trackMoviesResponse = trackMoviesDeferred.await()
+            val trackTVShowsResponse = trackTVShowsDeferred.await()
             val trackResponses = listOf(trackMoviesResponse, trackTVShowsResponse)
 
             val refreshInterval = if (trackResponses.filterIsInstance<Response.Failure<PickarrError>>().onEach {
