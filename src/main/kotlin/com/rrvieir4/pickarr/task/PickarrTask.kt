@@ -3,9 +3,7 @@ package com.rrvieir4.pickarr.task
 import com.rrvieir4.pickarr.config.Config.MediaRequirements
 import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
-import com.rrvieir4.pickarr.services.clients.onSuccess
-import com.rrvieir4.pickarr.services.clients.success
-import com.rrvieir4.pickarr.services.notification.NotificationClient
+import com.rrvieir4.pickarr.services.clients.unwrapAndRewrap
 import com.rrvieir4.pickarr.services.popular.PopularItem
 import com.rrvieir4.pickarr.services.popular.PopularService
 import com.rrvieir4.pickarr.services.servarr.ServarrService
@@ -24,13 +22,13 @@ class PickarrTask(
 
 
     suspend fun getRecommendedMovies(): Response<List<RecommendedItem>, PickarrError> {
-        return popularService.fetchPopularMovies().onSuccess { popularItems ->
+        return popularService.fetchPopularMovies().unwrapAndRewrap { popularItems ->
             track(popularItems, movieRequirements, moviesService)
         }
     }
 
     suspend fun getRecommendedTVShows(): Response<List<RecommendedItem>, PickarrError> {
-        return popularService.fetchPopularTV().onSuccess { popularItems ->
+        return popularService.fetchPopularTV().unwrapAndRewrap { popularItems ->
             track(popularItems, tvShowsRequirements, tvShowsService)
         }
     }
@@ -41,7 +39,7 @@ class PickarrTask(
         servarrService: ServarrService<*>
     ): Response<List<RecommendedItem>, PickarrError> {
 
-        return servarrService.getItems().onSuccess { servarrItemList ->
+        return servarrService.getItems().unwrapAndRewrap { servarrItemList ->
 
             val pastRecommendedItems =
                 dbClient.updateRecommendedItems(servarrItemList.map { it.toRecommendedItem() })
@@ -55,8 +53,8 @@ class PickarrTask(
                         } == null
             }
 
-            servarrService.getItems(relevantPopularItems.map { it.id }).onSuccess { lookupItemList ->
-                success(
+            servarrService.getItems(relevantPopularItems.map { it.id }).unwrapAndRewrap { lookupItemList ->
+                Response.Success(
                     lookupItemList.zip(relevantPopularItems) { servarrItem, popularItem ->
                         servarrItem.toRecommendedItem(popularItem)
                     }.sortedDescending()
