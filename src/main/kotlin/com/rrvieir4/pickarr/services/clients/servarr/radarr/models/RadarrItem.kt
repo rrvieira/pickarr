@@ -13,7 +13,7 @@ data class RadarrItem(
     val overview: String,
     val inCinemas: String?,
     val physicalRelease: String?,
-    val images: List<Image>,
+    override val images: List<Image>,
     val website: String,
     override val year: Int,
     val hasFile: Boolean,

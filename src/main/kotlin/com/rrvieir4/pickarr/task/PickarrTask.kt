@@ -59,7 +59,8 @@ class PickarrTask(
                 success(
                     lookupItemList.zip(relevantPopularItems) { servarrItem, popularItem ->
                         servarrItem.toRecommendedItem(popularItem)
-                    })
+                    }.sortedDescending()
+                )
             }
         }
     }

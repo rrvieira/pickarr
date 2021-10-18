@@ -15,12 +15,11 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-fun Application.configureRouting() {
+fun Application.configureRouting(config: Config) {
 
     routing {
-        get("/add-movie/{imdbId}") {
+        get("/${config.actionUrlConfig.addMovieMethod}/{imdbId}") {
             val imdbId = call.parameters["imdbId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
-            val config = Config.setupFromEnv() ?: return@get call.respond(HttpStatusCode.InternalServerError)
 
             val httpClient = getHttpClient()
             val radarrService = RadarrService(config.radarrConfig, httpClient)
@@ -36,9 +35,8 @@ fun Application.configureRouting() {
             httpClient.close()
         }
 
-        get("/add-tv/{imdbId}") {
+        get("/${config.actionUrlConfig.addTVMethod}/{imdbId}") {
             val imdbId = call.parameters["imdbId"] ?: return@get call.respond(HttpStatusCode.BadRequest)
-            val config = Config.setupFromEnv() ?: return@get call.respond(HttpStatusCode.InternalServerError)
 
             val httpClient = getHttpClient()
             val sonarrService = SonarrService(config.sonarrConfig, httpClient)

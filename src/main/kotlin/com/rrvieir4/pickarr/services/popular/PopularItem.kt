@@ -1,6 +1,6 @@
 package com.rrvieir4.pickarr.services.popular
 
-interface PopularItem : Comparable<PopularItem> {
+interface PopularItem {
     val id: String
     val title: String
     val year: Int

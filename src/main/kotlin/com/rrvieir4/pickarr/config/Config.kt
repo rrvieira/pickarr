@@ -7,12 +7,14 @@ data class Config(
     val movieRequirements: MediaRequirements,
     val tvRequirements: MediaRequirements,
     val tagName: String,
-    val telegramConfig: TelegramConfig,
+    val actionUrlConfig: ActionUrlConfig,
+    val telegramConfig: TelegramConfig
 ) {
     data class RefreshInterval(val default: Long, val retry: Long)
     data class ServarrConfig(val url: String, val apiKey: String, val qualityProfileName: String, val tagName: String)
     data class MediaRequirements(val minYear: Int, val minVotes: Int, val minRating: Float)
-    data class TelegramConfig(val telegramUserToken: String, val telegramChatId: Long, val telegramActionUrl: String)
+    data class TelegramConfig(val telegramUserToken: String, val telegramChatId: Long)
+    data class ActionUrlConfig(val actionUrl: String, val addMovieMethod: String, val addTVMethod: String)
 
     companion object {
         private const val REFRESH_INTERVAL = "refreshInterval"
@@ -37,8 +39,12 @@ data class Config(
 
         private const val TELEGRAM_USER_TOKEN = "telegramUserToken"
         private const val TELEGRAM_CHAT_ID = "telegramChatId"
-        private const val NOTIFICATION_ACTION_URL = "actionAddress"
 
+        private const val ACTION_URL = "actionAddress"
+        private const val ACTION_ADD_MOVIE_METHOD = "add-movie"
+        private const val ACTION_ADD_TV_METHOD = "add-tv"
+
+        private const val DEFAULT_REFRESH_INTERVAL = 24 * 60 * 60L
         private const val RETRY_REFRESH_INTERVAL = 1800L
 
         private const val DEFAULT_TAG_NAME = "pickarr"
@@ -53,9 +59,9 @@ data class Config(
 
         fun setupFromEnv(): Config? {
             val refreshInterval = try {
-                System.getenv(REFRESH_INTERVAL).toLong()
+                System.getenv(REFRESH_INTERVAL)?.toLong() ?: DEFAULT_REFRESH_INTERVAL
             } catch (e: NumberFormatException) {
-                (24 * 60 * 60)
+                DEFAULT_REFRESH_INTERVAL
             }
 
             val radarrUrl = System.getenv(RADARR_URL) ?: return null
@@ -88,7 +94,8 @@ data class Config(
                 return null
             }
 
-            val telegramActionUrl = System.getenv(NOTIFICATION_ACTION_URL) ?: return null
+            val actionUrl = System.getenv(ACTION_URL) ?: return null
+
             val telegramUserToken = System.getenv(TELEGRAM_USER_TOKEN) ?: return null
             val telegramChatId = try {
                 System.getenv(TELEGRAM_CHAT_ID)?.toLong() ?: return null
@@ -103,7 +110,8 @@ data class Config(
                 MediaRequirements(movieMinYear, movieMinVotes, movieMinRating),
                 MediaRequirements(tvMinYear, tvMinVotes, tvMinRating),
                 tagName,
-                TelegramConfig(telegramUserToken, telegramChatId, telegramActionUrl)
+                ActionUrlConfig(actionUrl, ACTION_ADD_MOVIE_METHOD, ACTION_ADD_TV_METHOD),
+                TelegramConfig(telegramUserToken, telegramChatId)
             )
         }
     }

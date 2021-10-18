@@ -13,7 +13,7 @@ data class SonarrItem(
     val overview: String,
     val network: String,
     val airTime: String,
-    val images: List<Image>,
+    override val images: List<Image>,
     val remotePoster: String,
     val seasons: List<Season>,
     override val year: Int,

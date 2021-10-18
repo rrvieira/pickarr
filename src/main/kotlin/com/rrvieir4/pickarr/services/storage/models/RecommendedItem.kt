@@ -9,16 +9,38 @@ data class RecommendedItem(
     val id: String,
     val title: String,
     val year: Int,
-    val genres: List<String> = listOf(),
-    val from: String = "",
+    val posterUrl: String,
+    val genres: List<String>,
+    val from: String,
     val link: String = "",
     val rating: Float = 0f,
     val totalVotes: Int = 0,
     val popularityPosition: Int = 0,
-)
+): Comparable<RecommendedItem> {
+    override fun compareTo(other: RecommendedItem): Int {
+        return if (rating == other.rating && totalVotes == other.totalVotes) {
+            other.popularityPosition.compareTo(popularityPosition)
+        } else if (rating == other.rating) {
+            totalVotes.compareTo(other.totalVotes)
+        } else {
+            rating.compareTo(other.rating)
+        }
+    }
+}
 
 fun ServarrItem.toRecommendedItem(popularItem: PopularItem? = null): RecommendedItem {
     return popularItem?.let {
-        RecommendedItem(imdbId, title, year, genres, from, it.link, it.rating, it.totalVotes, it.popularityPosition)
-    } ?: RecommendedItem(imdbId, title, year, genres, from)
+        RecommendedItem(
+            imdbId,
+            title,
+            year,
+            posterUrl,
+            genres,
+            from,
+            it.link,
+            it.rating,
+            it.totalVotes,
+            it.popularityPosition
+        )
+    } ?: RecommendedItem(imdbId, title, year, posterUrl, genres, from)
 }

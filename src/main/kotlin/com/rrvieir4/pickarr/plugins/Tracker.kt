@@ -1,16 +1,14 @@
 package com.rrvieir4.pickarr.plugins
 
-import com.rrvieir4.pickarr.services.notification.telegram.TelegramClient
-import com.rrvieir4.pickarr.services.storage.DBClient
 import com.rrvieir4.pickarr.config.Config
 import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
-import com.rrvieir4.pickarr.services.clients.onSuccess
 import com.rrvieir4.pickarr.services.notification.NotificationClient
+import com.rrvieir4.pickarr.services.notification.telegram.TelegramClient
 import com.rrvieir4.pickarr.services.popular.sources.ImdbService
 import com.rrvieir4.pickarr.services.servarr.radarr.RadarrService
 import com.rrvieir4.pickarr.services.servarr.sonarr.SonarrService
-import com.rrvieir4.pickarr.services.storage.models.RecommendedItem
+import com.rrvieir4.pickarr.services.storage.DBClient
 import com.rrvieir4.pickarr.task.PickarrTask
 import io.ktor.application.*
 import io.ktor.client.*
@@ -21,7 +19,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
-fun Application.launchPickarrService(): Boolean {
+fun Application.launchPickarrTask(config: Config) {
 
     val httpClient = HttpClient(CIO) {
         install(Logging) {
@@ -32,13 +30,13 @@ fun Application.launchPickarrService(): Boolean {
             serializer = GsonSerializer()
         }
     }
-    val config = Config.setupFromEnv() ?: return false
-
 
     val notificationClient = TelegramClient(
         config.telegramConfig.telegramUserToken,
         config.telegramConfig.telegramChatId,
-        config.telegramConfig.telegramActionUrl
+        config.actionUrlConfig.actionUrl,
+        config.actionUrlConfig.addMovieMethod,
+        config.actionUrlConfig.addTVMethod
     )
 
     val popularService = ImdbService(httpClient)
@@ -77,8 +75,6 @@ fun Application.launchPickarrService(): Boolean {
             delay(TimeUnit.SECONDS.toMillis(refreshInterval))
         }
     }
-
-    return true
 }
 
 private suspend fun Response<*, PickarrError>.notifyError(notificationClient: NotificationClient) {
