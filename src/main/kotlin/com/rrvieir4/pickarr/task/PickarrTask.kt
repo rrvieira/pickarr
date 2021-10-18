@@ -54,11 +54,11 @@ class PickarrTask(
             }
 
             servarrService.getItems(relevantPopularItems.map { it.id }).rewrap { lookupItemList ->
-                Response.Success(
-                    lookupItemList.zip(relevantPopularItems) { servarrItem, popularItem ->
-                        servarrItem.toRecommendedItem(popularItem)
-                    }.sortedDescending()
-                )
+                val newRecommendedItems = lookupItemList.zip(relevantPopularItems) { servarrItem, popularItem ->
+                    servarrItem.toRecommendedItem(popularItem)
+                }.sortedDescending()
+                dbClient.updateRecommendedItems(newRecommendedItems)
+                Response.Success(newRecommendedItems)
             }
         }
     }

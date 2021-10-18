@@ -80,7 +80,7 @@ class TelegramClient(
     private companion object {
         const val MESSAGE_TITLE_TEMPLATE = "<b>%s New %s%s%s</b>"
         const val MEDIA_ITEM_TEMPLATE = """<a href="%s">&#8205;</a><a href="%s"><b>%s (%s)</b></a>
-<i><b>by:</b> %s</i>
+<i>by: %s</i>
 %s
 
 <b>Rating:</b> <code>%s (%s)</code>
