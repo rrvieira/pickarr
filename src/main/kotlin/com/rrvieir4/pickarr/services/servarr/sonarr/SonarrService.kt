@@ -9,6 +9,7 @@ import com.rrvieir4.pickarr.services.clients.servarr.sonarr.models.SeriesType
 import com.rrvieir4.pickarr.services.clients.servarr.sonarr.models.TVAddOptions
 import com.rrvieir4.pickarr.services.clients.servarr.sonarr.models.SonarrItem
 import com.rrvieir4.pickarr.services.clients.tvdb.TvdbClient
+import com.rrvieir4.pickarr.services.clients.unwrapSuccess
 import com.rrvieir4.pickarr.services.servarr.ServarrService
 import io.ktor.client.*
 
@@ -28,38 +29,29 @@ class SonarrService(private val config: ServarrConfig, private val httpClient: H
     override suspend fun getItems(): Response<List<SonarrItem>, PickarrError> = sonarrClient.getExistingTVShows()
 
     override suspend fun addItem(imdbId: String): Response<SonarrItem, PickarrError> {
-        val rootFolderResponse = sonarrClient.getRootFolders()
-        val qualityProfileResponse = sonarrClient.getQualityProfiles()
-        val languageProfileResponse = sonarrClient.getLanguageProfiles()
-        val serieToAddResponse = lookupItemWithImdbId(imdbId)
-        val tagResponse = saveTag(config.tagName)
+        val rootFolder =
+            sonarrClient.getRootFolders().unwrapSuccess()?.firstOrNull() ?: return apiError("no root folder")
+        val qualityProfile =
+            sonarrClient.getQualityProfiles().unwrapSuccess()?.find { it.name == config.qualityProfileName }
+                ?: return apiError("invalid quality profile")
+        val languageProfile =
+            sonarrClient.getLanguageProfiles().unwrapSuccess()?.firstOrNull() ?: return apiError("no language profile")
+        val serieToAdd =
+            lookupItemWithImdbId(imdbId).unwrapSuccess()?.firstOrNull() ?: return apiError("no tv show to add")
+        val tag = saveTag(config.tagName).unwrapSuccess() ?: return apiError("invalid tag")
 
-        return if (rootFolderResponse is Response.Success &&
-            qualityProfileResponse is Response.Success &&
-            languageProfileResponse is Response.Success &&
-            serieToAddResponse is Response.Success &&
-            tagResponse is Response.Success
-        ) {
-            val qualityProfile = qualityProfileResponse.body.find { it.name == config.qualityProfileName }
-                ?: return Response.Failure(PickarrError.GenericError("Quality Profile does not exist: ${config.qualityProfileName}"))
-            val languageProfile = languageProfileResponse.body.first()
-
-            val tvItem = serieToAddResponse.body.first()
-            val serieBody = tvItem.copy(
-                seriesType = if (tvItem.hasGenre(SeriesType.anime.name)) SeriesType.anime else SeriesType.standard,
-                rootFolderPath = rootFolderResponse.body.first().path,
+        return sonarrClient.addTV(
+            serieToAdd.copy(
+                seriesType = if (serieToAdd.hasGenre(SeriesType.anime.name)) SeriesType.anime else SeriesType.standard,
+                rootFolderPath = rootFolder.path,
                 qualityProfileId = qualityProfile.id,
                 languageProfileId = languageProfile.id,
                 seasonFolder = true,
-                tags = listOf(tagResponse.body.id),
+                tags = listOf(tag.id),
                 monitored = true,
                 addOptions = TVAddOptions(true)
             )
-
-            sonarrClient.addTV(serieBody)
-        } else {
-            Response.Failure(PickarrError.ApiError("Preparation to add tv series failed"))
-        }
+        )
     }
 
     override suspend fun lookupItemWithImdbId(imdbId: String): Response<List<SonarrItem>, PickarrError> {

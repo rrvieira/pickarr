@@ -3,7 +3,7 @@ package com.rrvieir4.pickarr.task
 import com.rrvieir4.pickarr.config.Config.MediaRequirements
 import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
-import com.rrvieir4.pickarr.services.clients.unwrapAndRewrap
+import com.rrvieir4.pickarr.services.clients.rewrap
 import com.rrvieir4.pickarr.services.popular.PopularItem
 import com.rrvieir4.pickarr.services.popular.PopularService
 import com.rrvieir4.pickarr.services.servarr.ServarrService
@@ -22,13 +22,13 @@ class PickarrTask(
 
 
     suspend fun getRecommendedMovies(): Response<List<RecommendedItem>, PickarrError> {
-        return popularService.fetchPopularMovies().unwrapAndRewrap { popularItems ->
+        return popularService.fetchPopularMovies().rewrap { popularItems ->
             track(popularItems, movieRequirements, moviesService)
         }
     }
 
     suspend fun getRecommendedTVShows(): Response<List<RecommendedItem>, PickarrError> {
-        return popularService.fetchPopularTV().unwrapAndRewrap { popularItems ->
+        return popularService.fetchPopularTV().rewrap { popularItems ->
             track(popularItems, tvShowsRequirements, tvShowsService)
         }
     }
@@ -39,7 +39,7 @@ class PickarrTask(
         servarrService: ServarrService<*>
     ): Response<List<RecommendedItem>, PickarrError> {
 
-        return servarrService.getItems().unwrapAndRewrap { servarrItemList ->
+        return servarrService.getItems().rewrap { servarrItemList ->
 
             val pastRecommendedItems =
                 dbClient.updateRecommendedItems(servarrItemList.map { it.toRecommendedItem() })
@@ -53,7 +53,7 @@ class PickarrTask(
                         } == null
             }
 
-            servarrService.getItems(relevantPopularItems.map { it.id }).unwrapAndRewrap { lookupItemList ->
+            servarrService.getItems(relevantPopularItems.map { it.id }).rewrap { lookupItemList ->
                 Response.Success(
                     lookupItemList.zip(relevantPopularItems) { servarrItem, popularItem ->
                         servarrItem.toRecommendedItem(popularItem)

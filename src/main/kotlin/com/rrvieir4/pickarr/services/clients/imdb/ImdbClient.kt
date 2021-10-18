@@ -3,6 +3,7 @@ package com.rrvieir4.pickarr.services.clients.imdb
 import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
 import com.rrvieir4.pickarr.services.clients.pickarrGet
+import com.rrvieir4.pickarr.services.clients.rewrap
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -18,13 +19,10 @@ class ImdbClient(private val httpClient: HttpClient) {
     }
 
     private suspend fun getPopular(imdbUrl: String): Response<List<ImdbItem>, PickarrError> {
-        return when (val htmlResponse = getPopularMediaHtml(imdbUrl)) {
-            is Response.Failure -> return htmlResponse
-            is Response.Success -> {
-                htmlResponse.body.parseImdbMediaList(IMDB_URL)?.let {
-                    Response.Success(it)
-                } ?: Response.Failure(PickarrError.ParseError("Could not parse imdb html response"))
-            }
+        return getPopularMediaHtml(imdbUrl).rewrap { htmlResponse ->
+            htmlResponse.parseImdbMediaList(IMDB_URL)?.let {
+                Response.Success(it)
+            } ?: Response.Failure(PickarrError.ParseError("Could not parse imdb html response"))
         }
     }
 

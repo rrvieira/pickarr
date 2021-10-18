@@ -2,9 +2,10 @@ package com.rrvieir4.pickarr.services.servarr
 
 import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
+import com.rrvieir4.pickarr.services.clients.rewrap
 import com.rrvieir4.pickarr.services.clients.servarr.models.ServarrItem
 import com.rrvieir4.pickarr.services.clients.servarr.models.Tag
-import com.rrvieir4.pickarr.services.clients.servarr.sonarr.models.SonarrItem
+import com.rrvieir4.pickarr.services.clients.unwrapSuccess
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
@@ -24,10 +25,7 @@ interface ServarrService<I : ServarrItem> {
 
     suspend fun getItems(imdbIdList: List<String>): Response<List<I>, PickarrError> {
         val items = imdbIdList.asFlow().map { imdbId ->
-            when (val lookupResponse = lookupItemWithImdbId(imdbId)) {
-                is Response.Failure -> null
-                is Response.Success -> lookupResponse.body.first()
-            }
+            lookupItemWithImdbId(imdbId).unwrapSuccess()?.firstOrNull()
         }.toList().filterNotNull()
 
         return if (items.size == imdbIdList.size) {
@@ -38,30 +36,27 @@ interface ServarrService<I : ServarrItem> {
     }
 
     suspend fun saveItem(imdbId: String): Response<I, PickarrError> {
-        return when (val itemsResponse = getItems()) {
-            is Response.Success -> {
-                val existingMovie = itemsResponse.body.find { it.imdbId == imdbId }
-                if (existingMovie == null) {
-                    addItem(imdbId)
-                } else {
-                    Response.Success(existingMovie)
-                }
+        return getItems().rewrap { items ->
+            val existingMovie = items.find { it.imdbId == imdbId }
+            if (existingMovie == null) {
+                addItem(imdbId)
+            } else {
+                Response.Success(existingMovie)
             }
-            is Response.Failure -> itemsResponse
         }
     }
 
     suspend fun saveTag(tagName: String): Response<Tag, PickarrError> {
-        return when (val tagsResponse = getTags()) {
-            is Response.Success -> {
-                val existingTag = tagsResponse.body.find { it.label == tagName }
-                if (existingTag == null) {
-                    addTag(tagName)
-                } else {
-                    Response.Success(existingTag)
-                }
+        return getTags().rewrap { tags ->
+            val existingTag = tags.find { it.label == tagName }
+            if (existingTag == null) {
+                addTag(tagName)
+            } else {
+                Response.Success(existingTag)
             }
-            is Response.Failure -> tagsResponse
         }
     }
+
+    fun apiError(error: String): Response.Failure<PickarrError.ApiError> =
+        Response.Failure(PickarrError.ApiError("${this::class.simpleName}: $error"))
 }

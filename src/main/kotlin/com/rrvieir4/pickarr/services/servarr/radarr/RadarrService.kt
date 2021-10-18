@@ -7,6 +7,7 @@ import com.rrvieir4.pickarr.services.clients.servarr.models.Tag
 import com.rrvieir4.pickarr.services.clients.servarr.radarr.RadarrClient
 import com.rrvieir4.pickarr.services.clients.servarr.radarr.models.MovieAddOptions
 import com.rrvieir4.pickarr.services.clients.servarr.radarr.models.RadarrItem
+import com.rrvieir4.pickarr.services.clients.unwrapSuccess
 import com.rrvieir4.pickarr.services.servarr.ServarrService
 import io.ktor.client.*
 
@@ -24,31 +25,24 @@ class RadarrService(private val config: ServarrConfig, httpClient: HttpClient) :
     override suspend fun addTag(tagName: String): Response<Tag, PickarrError> = radarrClient.addTag(tagName)
 
     override suspend fun addItem(imdbId: String): Response<RadarrItem, PickarrError> {
-        val rootFolderResponse = radarrClient.getRootFolders()
-        val qualityProfileResponse = radarrClient.getQualityProfiles()
-        val movieToAddResponse = radarrClient.lookupMovieWithImdbId(imdbId)
-        val tagResponse = saveTag(config.tagName)
+        val rootFolder =
+            radarrClient.getRootFolders().unwrapSuccess()?.firstOrNull() ?: return apiError("no root folder")
+        val qualityProfile =
+            radarrClient.getQualityProfiles().unwrapSuccess()?.find { it.name == config.qualityProfileName }
+                ?: return apiError("invalid quality profile")
+        val movieToAdd = radarrClient.lookupMovieWithImdbId(imdbId).unwrapSuccess()?.firstOrNull()
+            ?: return apiError("no movie to add")
+        val tag = saveTag(config.tagName).unwrapSuccess() ?: return apiError("no tag")
 
-        return if (rootFolderResponse is Response.Success &&
-            qualityProfileResponse is Response.Success &&
-            movieToAddResponse is Response.Success &&
-            tagResponse is Response.Success
-        ) {
-            val qualityProfile = qualityProfileResponse.body.find { it.name == config.qualityProfileName }
-                ?: return Response.Failure(PickarrError.GenericError("Quality Profile does not exist: ${config.qualityProfileName}"))
-
-            val movieBody = movieToAddResponse.body.first().copy(
-                rootFolderPath = rootFolderResponse.body.first().path,
+        return radarrClient.addMovie(
+            movieToAdd.copy(
+                rootFolderPath = rootFolder.path,
                 qualityProfileId = qualityProfile.id,
-                tags = listOf(tagResponse.body.id),
+                tags = listOf(tag.id),
                 monitored = true,
                 addOptions = MovieAddOptions(true)
             )
-
-            radarrClient.addMovie(movieBody)
-        } else {
-            Response.Failure(PickarrError.ApiError("Preparation to add movie failed"))
-        }
+        )
     }
 
     override suspend fun lookupItemWithImdbId(imdbId: String): Response<List<RadarrItem>, PickarrError> =

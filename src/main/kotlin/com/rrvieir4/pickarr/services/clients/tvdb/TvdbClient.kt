@@ -3,6 +3,7 @@ package com.rrvieir4.pickarr.services.clients.tvdb
 import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
 import com.rrvieir4.pickarr.services.clients.pickarrGet
+import com.rrvieir4.pickarr.services.clients.rewrap
 import io.ktor.client.*
 
 class TvdbClient(private val httpClient: HttpClient) {
@@ -12,11 +13,8 @@ class TvdbClient(private val httpClient: HttpClient) {
             val tvdbResponse: Response<String, PickarrError> =
                 httpClient.pickarrGet(TV_DB_GET_IMDB_ID_URL_TEMPLATE.format(imdbId))
 
-            when (tvdbResponse) {
-                is Response.Failure -> return tvdbResponse
-                is Response.Success -> {
-                    Response.Success(tvdbResponse.body.parseTvdbId())
-                }
+            tvdbResponse.rewrap {
+                Response.Success(it.parseTvdbId())
             }
         } catch (e: NullPointerException) {
             Response.Failure(PickarrError.ParseError("Could not parse tvdb XML response"))
