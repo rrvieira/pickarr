@@ -1,9 +1,7 @@
 package com.rrvieir4.pickarr.plugins
 
-import com.rrvieir4.pickarr.services.clients.Response
-import com.rrvieir4.pickarr.services.clients.servarr.radarr.RadarrClient
-import com.rrvieir4.pickarr.services.clients.servarr.sonarr.SonarrClient
 import com.rrvieir4.pickarr.config.Config
+import com.rrvieir4.pickarr.services.clients.unwrap
 import com.rrvieir4.pickarr.services.servarr.radarr.RadarrService
 import com.rrvieir4.pickarr.services.servarr.sonarr.SonarrService
 import io.ktor.application.*
@@ -24,13 +22,11 @@ fun Application.configureRouting(config: Config) {
             val httpClient = getHttpClient()
             val radarrService = RadarrService(config.radarrConfig, httpClient)
 
-            when (val addMovieResponse = radarrService.saveItem(imdbId)) {
-                is Response.Success -> call.respondRedirect(
-                    radarrService.getItemDetailWebpageUrl(addMovieResponse.body),
-                    false
-                )
-                is Response.Failure -> call.respond(HttpStatusCode.InternalServerError, "Internal server error")
-            }
+            radarrService.saveItem(imdbId).unwrap({
+                call.respond(HttpStatusCode.InternalServerError, "Internal server error: ${it.error}")
+            }, {
+                call.respondRedirect(radarrService.getItemDetailWebpageUrl(it), false)
+            })
 
             httpClient.close()
         }
@@ -41,13 +37,11 @@ fun Application.configureRouting(config: Config) {
             val httpClient = getHttpClient()
             val sonarrService = SonarrService(config.sonarrConfig, httpClient)
 
-            when (val addTVResponse = sonarrService.saveItem(imdbId)) {
-                is Response.Success -> call.respondRedirect(
-                    sonarrService.getItemDetailWebpageUrl(addTVResponse.body),
-                    false
-                )
-                is Response.Failure -> call.respond(HttpStatusCode.InternalServerError, "Internal server error")
-            }
+            sonarrService.saveItem(imdbId).unwrap({
+                call.respond(HttpStatusCode.InternalServerError, "Internal server error: ${it.error}")
+            }, {
+                call.respondRedirect(sonarrService.getItemDetailWebpageUrl(it), false)
+            })
 
             httpClient.close()
         }
