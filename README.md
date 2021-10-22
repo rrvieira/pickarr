@@ -12,9 +12,9 @@ and provides the following actions:
 - Open IMDb movie/tvshow details page
 - Add to [Radarr](https://github.com/Radarr/Radarr)/[Sonarr](https://github.com/Sonarr/Sonarr)
 
-### Recommendations - Demo
+### Recommendation Messages - Demo
 
-TBD
+https://user-images.githubusercontent.com/3785821/138489202-41a828cc-40fc-4c44-8234-ed61f165a284.MP4
 
 # Usage
 
