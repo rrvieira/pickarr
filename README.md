@@ -14,7 +14,11 @@ and provides the following actions:
 
 ### Recommendation Messages - Demo
 
-https://user-images.githubusercontent.com/3785821/138489202-41a828cc-40fc-4c44-8234-ed61f165a284.MP4
+<p float="left">
+  <img width=310 src="https://user-images.githubusercontent.com/3785821/138491362-41981e8a-c129-4eab-af63-d2e18b15fd76.png">
+  <img width=310 src="https://user-images.githubusercontent.com/3785821/138491380-70201e81-7015-4b87-8df3-d4dd6265b54c.png">
+</p>
+
 
 # Usage
 
