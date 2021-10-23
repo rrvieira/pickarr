@@ -7,6 +7,7 @@ Pickar is a service (distributed in a docker image) that keeps an eye on trendin
 - IMDb rating and number of votes
 - Popularity ranking
 - Genres
+- Poster image
 
 and provides the following actions:
 - Open IMDb movie/tvshow details page
