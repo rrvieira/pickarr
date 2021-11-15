@@ -42,7 +42,7 @@ class PickarrTask(
         return servarrService.getItems().rewrap { servarrItemList ->
 
             val pastRecommendedItems =
-                dbClient.updateRecommendedItems(servarrItemList.map { it.toRecommendedItem() })
+                dbClient.updateRecommendedItems(servarrItemList.mapNotNull { it.toRecommendedItem() })
 
             val relevantPopularItems = popularItems.filter { popularItem ->
                 popularItem.year >= mediaRequirements.minYear &&
@@ -56,7 +56,7 @@ class PickarrTask(
             servarrService.getItems(relevantPopularItems.map { it.id }).rewrap { lookupItemList ->
                 val newRecommendedItems = lookupItemList.zip(relevantPopularItems) { servarrItem, popularItem ->
                     servarrItem.toRecommendedItem(popularItem)
-                }.sortedDescending()
+                }.filterNotNull().sortedDescending()
                 dbClient.updateRecommendedItems(newRecommendedItems)
                 Response.Success(newRecommendedItems)
             }

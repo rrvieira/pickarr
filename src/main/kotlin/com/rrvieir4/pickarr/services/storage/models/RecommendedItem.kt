@@ -29,20 +29,26 @@ data class RecommendedItem(
     }
 }
 
-fun ServarrItem.toRecommendedItem(popularItem: PopularItem? = null): RecommendedItem {
-    return popularItem?.let {
-        RecommendedItem(
-            imdbId,
-            title,
-            overview,
-            year,
-            posterUrl,
-            genres,
-            from,
-            it.link,
-            it.rating,
-            it.totalVotes,
-            it.popularityPosition
-        )
-    } ?: RecommendedItem(imdbId, title, overview, year, posterUrl, genres, from)
+fun ServarrItem.toRecommendedItem(popularItem: PopularItem? = null): RecommendedItem? {
+    val id = imdbId
+
+    return if (id == null) {
+        null
+    } else {
+        popularItem?.let {
+            RecommendedItem(
+                id,
+                title,
+                overview,
+                year,
+                posterUrl,
+                genres,
+                from,
+                it.link,
+                it.rating,
+                it.totalVotes,
+                it.popularityPosition
+            )
+        } ?: RecommendedItem(id, title, overview, year, posterUrl, genres, from)
+    }
 }
