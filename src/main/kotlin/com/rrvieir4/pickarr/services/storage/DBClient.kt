@@ -1,6 +1,6 @@
 package com.rrvieir4.pickarr.services.storage
 
-import com.rrvieir4.pickarr.services.storage.models.RecommendedItem
+import com.rrvieir4.pickarr.services.notification.RecommendedItem
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.reactivestreams.KMongo
 

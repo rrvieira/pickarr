@@ -4,6 +4,7 @@ data class Config(
     val refreshInterval: RefreshInterval,
     val radarrConfig: ServarrConfig,
     val sonarrConfig: ServarrConfig,
+    val tmdbConfig: TmdbConfig,
     val movieRequirements: MediaRequirements,
     val tvRequirements: MediaRequirements,
     val tagName: String,
@@ -12,7 +13,8 @@ data class Config(
 ) {
     data class RefreshInterval(val default: Long, val retry: Long)
     data class ServarrConfig(val url: String, val apiKey: String, val qualityProfileName: String, val tagName: String)
-    data class MediaRequirements(val minYear: Int, val minVotes: Int, val minRating: Float)
+    data class TmdbConfig(val apiKey: String)
+    data class MediaRequirements(val minYear: Int, val minVotes: Int, val minRating: Float, val languageBlacklist: List<String>)
     data class TelegramConfig(val telegramUserToken: String, val telegramChatId: Long)
     data class ActionUrlConfig(val actionUrl: String, val addMovieMethod: String, val addTVMethod: String)
 
@@ -27,6 +29,8 @@ data class Config(
         private const val SONARR_API_KEY = "SONARR_API_KEY"
         private const val SONARR_QUALITY_PROFILE_NAME = "SONARR_QUALITY_PROFILE_NAME"
 
+        private const val TMDB_API_KEY = "TMDB_API_KEY"
+
         private const val TAG_NAME = "TAG_NAME"
 
         private const val MOVIE_MIN_YEAR = "MOVIE_MIN_YEAR"
@@ -36,6 +40,8 @@ data class Config(
         private const val TV_MIN_YEAR = "TV_SHOW_MIN_YEAR"
         private const val TV_MIN_VOTES = "TV_SHOW_MIN_VOTES"
         private const val TV_MIN_RATING = "TV_SHOW_MIN_RATING"
+
+        private const val LANGUAGE_BLACKLIST = "LANGUAGE_BLACKLIST"
 
         private const val TELEGRAM_USER_TOKEN = "TELEGRAM_USER_TOKEN"
         private const val TELEGRAM_CHAT_ID = "TELEGRAM_CHAT_ID"
@@ -73,6 +79,8 @@ data class Config(
             val sonarrApiKey = System.getenv(SONARR_API_KEY) ?: return null
             val sonarrQualityProfileName = System.getenv(SONARR_QUALITY_PROFILE_NAME) ?: return null
 
+            val tmdbApiKey = System.getenv(TMDB_API_KEY) ?: return null
+
             val tagName = System.getenv(TAG_NAME) ?: DEFAULT_TAG_NAME
 
             val (movieMinYear, movieMinVotes, movieMinRating) = try {
@@ -95,6 +103,8 @@ data class Config(
                 return null
             }
 
+            val languageBlacklist = System.getenv(LANGUAGE_BLACKLIST)?.split(",")?: emptyList()
+
             val actionUrl = System.getenv(ACTION_URL) ?: return null
 
             val telegramUserToken = System.getenv(TELEGRAM_USER_TOKEN) ?: return null
@@ -108,8 +118,9 @@ data class Config(
                 RefreshInterval(refreshInterval, RETRY_REFRESH_INTERVAL),
                 ServarrConfig(radarrUrl, radarrApiKey, radarQualityProfileName, tagName),
                 ServarrConfig(sonarrUrl, sonarrApiKey, sonarrQualityProfileName, tagName),
-                MediaRequirements(movieMinYear, movieMinVotes, movieMinRating),
-                MediaRequirements(tvMinYear, tvMinVotes, tvMinRating),
+                TmdbConfig(tmdbApiKey),
+                MediaRequirements(movieMinYear, movieMinVotes, movieMinRating, languageBlacklist),
+                MediaRequirements(tvMinYear, tvMinVotes, tvMinRating, languageBlacklist),
                 tagName,
                 ActionUrlConfig(actionUrl, ACTION_ADD_MOVIE_METHOD, ACTION_ADD_TV_METHOD),
                 TelegramConfig(telegramUserToken, telegramChatId)

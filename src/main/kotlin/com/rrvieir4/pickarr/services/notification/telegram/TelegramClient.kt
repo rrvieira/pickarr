@@ -4,7 +4,8 @@ import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.rrvieir4.pickarr.services.notification.NotificationClient
-import com.rrvieir4.pickarr.services.storage.models.RecommendedItem
+import com.rrvieir4.pickarr.services.notification.RecommendedItem
+import java.util.*
 
 
 class TelegramClient(
@@ -71,7 +72,9 @@ class TelegramClient(
             rating,
             totalVotes,
             popularityPosition,
+            Locale(originalLanguageCode).getDisplayLanguage(Locale.ENGLISH),
             genres.joinToString(", "),
+            castList.take(4).joinToString(", "),
             "$serverAddress/$addMethod/$id",
             notificationConfig.addToServarrName
         )
@@ -85,7 +88,10 @@ class TelegramClient(
 
 <b>Rating:</b> <code>%s (%s)</code>
 <b>Popularity:</b> <code>#%s</code>
+<b>Language:</b> <code>%s</code>
 <b>Genres:</b>
+<code>%s</code>
+<b>Main cast:</b>
 <code>%s</code>
 
 <a href="%s">⬇️ Add to %s</a>"""

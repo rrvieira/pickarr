@@ -1,7 +1,8 @@
-package com.rrvieir4.pickarr.services.storage.models
+package com.rrvieir4.pickarr.services.notification
 
 import com.rrvieir4.pickarr.services.clients.servarr.models.ServarrItem
 import com.rrvieir4.pickarr.services.popular.PopularItem
+import com.rrvieir4.pickarr.services.reccommend.models.TmdbItem
 import org.bson.codecs.pojo.annotations.BsonId
 
 data class RecommendedItem(
@@ -17,7 +18,9 @@ data class RecommendedItem(
     val rating: Float = 0f,
     val totalVotes: Int = 0,
     val popularityPosition: Int = 0,
-): Comparable<RecommendedItem> {
+    val originalLanguageCode: String = "",
+    val castList: List<String> = emptyList()
+) : Comparable<RecommendedItem> {
     override fun compareTo(other: RecommendedItem): Int {
         return if (rating == other.rating && totalVotes == other.totalVotes) {
             other.popularityPosition.compareTo(popularityPosition)
@@ -27,28 +30,20 @@ data class RecommendedItem(
             rating.compareTo(other.rating)
         }
     }
-}
 
-fun ServarrItem.toRecommendedItem(popularItem: PopularItem? = null): RecommendedItem? {
-    val id = imdbId
-
-    return if (id == null) {
-        null
-    } else {
-        popularItem?.let {
-            RecommendedItem(
-                id,
-                title,
-                overview,
-                year,
-                posterUrl,
-                genres,
-                from,
-                it.link,
-                it.rating,
-                it.totalVotes,
-                it.popularityPosition
-            )
-        } ?: RecommendedItem(id, title, overview, year, posterUrl, genres, from)
-    }
+    constructor(popularItem: PopularItem, tmdbItem: TmdbItem, servarrItem: ServarrItem) : this(
+        popularItem.id,
+        servarrItem.title,
+        servarrItem.overview,
+        servarrItem.year,
+        servarrItem.posterUrl,
+        servarrItem.genres,
+        servarrItem.from,
+        popularItem.link,
+        popularItem.rating,
+        popularItem.totalVotes,
+        popularItem.popularityPosition,
+        tmdbItem.originalLanguage,
+        tmdbItem.castList
+    )
 }

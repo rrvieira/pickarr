@@ -28,9 +28,9 @@ fun String.parseImdbMediaList(imdbUrl: String): List<ImdbItem>? {
                     .replace(",", "")
                     .toInt()
 
-                Pair(rating, totalVotes)
+                rating to totalVotes
             } else {
-                Pair(0f, 0)
+                0f to 0
             }
 
             ImdbItem(imdbId, title, year, imdbLink, rating, totalVotes, index + 1)
