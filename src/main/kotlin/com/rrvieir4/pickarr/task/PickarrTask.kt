@@ -77,7 +77,7 @@ class PickarrTask(
                     mediaRequirements.languageBlacklist.contains(recommendedItem.originalLanguageCode)
                 }
 
-                Response.Success(newRecommendedItems)
+                Response.Success(relevantItems)
             }
         }
     }
