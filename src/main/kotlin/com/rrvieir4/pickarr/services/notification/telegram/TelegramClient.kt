@@ -4,7 +4,7 @@ import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.entities.ChatId
 import com.github.kotlintelegrambot.entities.ParseMode
 import com.rrvieir4.pickarr.services.notification.NotificationClient
-import com.rrvieir4.pickarr.services.notification.RecommendedItem
+import com.rrvieir4.pickarr.services.recommendation.models.IRecommendedDetailsItem
 import java.util.*
 
 
@@ -21,11 +21,11 @@ class TelegramClient(
     }
     private val chatId = ChatId.fromId(chatIdKey)
 
-    override suspend fun notifyNewMovies(recommendedItemList: List<RecommendedItem>): Boolean {
+    override suspend fun notifyNewMovies(recommendedItemList: List<IRecommendedDetailsItem>): Boolean {
         return sendMessage(NotificationConfig.RADARR, serverAddMovieMethod, recommendedItemList)
     }
 
-    override suspend fun notifyNewTV(recommendedItemList: List<RecommendedItem>): Boolean {
+    override suspend fun notifyNewTV(recommendedItemList: List<IRecommendedDetailsItem>): Boolean {
         return sendMessage(NotificationConfig.SONARR, serverAddTVMethod, recommendedItemList)
     }
 
@@ -36,7 +36,7 @@ class TelegramClient(
     private fun sendMessage(
         notificationConfig: NotificationConfig,
         addMethod: String,
-        recommendedItemList: List<RecommendedItem>
+        recommendedItemList: List<IRecommendedDetailsItem>
     ): Boolean {
         if (recommendedItemList.isEmpty()) {
             return false
@@ -61,7 +61,7 @@ class TelegramClient(
         bot.sendMessage(chatId, html, parseMode = ParseMode.HTML, disableWebPagePreview = false)
     }
 
-    private fun RecommendedItem.formatMessage(notificationConfig: NotificationConfig, addMethod: String): String {
+    private fun IRecommendedDetailsItem.formatMessage(notificationConfig: NotificationConfig, addMethod: String): String {
         return MEDIA_ITEM_TEMPLATE.format(
             posterUrl,
             link,

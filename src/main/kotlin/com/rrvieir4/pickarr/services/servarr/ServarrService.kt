@@ -45,7 +45,11 @@ interface ServarrService<I : ServarrItem> {
             }
         }.toMap()
 
-        Response.Success(itemsMap)
+        if (imdbIdList.isNotEmpty() && itemsMap.isEmpty()) {
+            apiError("${this::class.simpleName}: Could not retrieve any servarr item details.")
+        } else {
+            Response.Success(itemsMap)
+        }
     }
 
     suspend fun saveItem(imdbId: String): Response<I, PickarrError> {

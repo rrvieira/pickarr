@@ -1,11 +1,11 @@
-package com.rrvieir4.pickarr.services.reccommend
+package com.rrvieir4.pickarr.services.tmdb
 
 import com.rrvieir4.pickarr.config.Config
 import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
 import com.rrvieir4.pickarr.services.clients.tmdb.TmdbClient
 import com.rrvieir4.pickarr.services.clients.unwrapSuccess
-import com.rrvieir4.pickarr.services.reccommend.models.TmdbItem
+import com.rrvieir4.pickarr.services.tmdb.models.TmdbItem
 import io.ktor.client.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -36,12 +36,7 @@ class TmdbService(
                             }.unwrapSuccess()
                         }
                         if (tmdbMedia?.id != null && tmdbMedia.originalLanguage != null && tmdbCredits?.castNameList != null) {
-                            TmdbItem(
-                                tmdbMedia.id,
-                                imdbId,
-                                tmdbMedia.originalLanguage,
-                                tmdbCredits.castNameList
-                            )
+                            TmdbItem(tmdbMedia.id, imdbId, tmdbMedia.originalLanguage, tmdbCredits.castNameList)
                         } else {
                             null
                         }
@@ -57,6 +52,10 @@ class TmdbService(
                 }
             }
 
-            Response.Success(itemsMap)
+            if (imdbIdList.isNotEmpty() && itemsMap.isEmpty()) {
+                Response.Failure(PickarrError.ApiError("${this::class.simpleName}: Could not retrieve any tmdb details."))
+            } else {
+                Response.Success(itemsMap)
+            }
         }
 }

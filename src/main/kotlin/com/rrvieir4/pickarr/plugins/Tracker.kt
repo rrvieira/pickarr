@@ -6,7 +6,8 @@ import com.rrvieir4.pickarr.services.clients.Response
 import com.rrvieir4.pickarr.services.notification.NotificationClient
 import com.rrvieir4.pickarr.services.notification.telegram.TelegramClient
 import com.rrvieir4.pickarr.services.popular.sources.ImdbService
-import com.rrvieir4.pickarr.services.reccommend.TmdbService
+import com.rrvieir4.pickarr.services.recommendation.RecommendationService
+import com.rrvieir4.pickarr.services.tmdb.TmdbService
 import com.rrvieir4.pickarr.services.servarr.radarr.RadarrService
 import com.rrvieir4.pickarr.services.servarr.sonarr.SonarrService
 import com.rrvieir4.pickarr.services.storage.DBClient
@@ -46,11 +47,13 @@ fun Application.launchPickarrTask(config: Config) {
     val tvShowsService = SonarrService(config.sonarrConfig, httpClient)
     val tmdbService = TmdbService(config.tmdbConfig, httpClient)
 
+    val moviesRecommendationService = RecommendationService(tmdbService, moviesService)
+    val tvRecommendationService = RecommendationService(tmdbService, tvShowsService)
+
     val pickarrTask = PickarrTask(
         popularService,
-        moviesService,
-        tvShowsService,
-        tmdbService,
+        moviesRecommendationService,
+        tvRecommendationService,
         DBClient,
         config.movieRequirements,
         config.tvRequirements

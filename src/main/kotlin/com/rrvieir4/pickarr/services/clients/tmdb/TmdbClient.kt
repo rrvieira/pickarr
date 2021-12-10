@@ -12,7 +12,7 @@ import io.ktor.http.*
 class TmdbClient(private val apiKey: String, private val httpClient: HttpClient) {
 
     suspend fun findMedia(imdbId: String): Response<FindResponse, PickarrError> {
-        return httpClient.pickarrGet("$API_URL/find/$imdbId") {
+        return httpClient.pickarrGet("${API_URL}find/${imdbId}") {
             contentType(ContentType.Application.Json)
             parameter(API_KEY_PARAMETER, apiKey)
             parameter("external_source", "imdb_id")
@@ -24,7 +24,7 @@ class TmdbClient(private val apiKey: String, private val httpClient: HttpClient)
     suspend fun getTVCredits(tmdbId: String) = getCredits("tv", tmdbId)
 
     private suspend fun getCredits(baseMethod: String, tmdbId: String): Response<Credits, PickarrError> {
-        return httpClient.pickarrGet("$API_URL/$baseMethod/$tmdbId/credits") {
+        return httpClient.pickarrGet("${API_URL}${baseMethod}/${tmdbId}/credits") {
             contentType(ContentType.Application.Json)
             parameter(API_KEY_PARAMETER, apiKey)
         }

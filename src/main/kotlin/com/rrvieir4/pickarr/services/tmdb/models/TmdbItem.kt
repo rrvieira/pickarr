@@ -1,4 +1,4 @@
-package com.rrvieir4.pickarr.services.reccommend.models
+package com.rrvieir4.pickarr.services.tmdb.models
 
 data class TmdbItem(
     val tmdbId: String,

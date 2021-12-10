@@ -29,3 +29,10 @@ fun <S : Any> Response<S, PickarrError>.unwrapSuccess(): S? {
         is Response.Success -> this.body
     }
 }
+
+fun <S : Any> Response<S, PickarrError>.unwrap(): Pair<S?, PickarrError?> {
+    return when (this) {
+        is Response.Failure -> null to this.body
+        is Response.Success -> this.body to null
+    }
+}
