@@ -1,43 +1,52 @@
-package com.rrvieir4.pickarr.task
+package com.rrvieir4.pickarr.services.recommendation
 
 import com.rrvieir4.pickarr.config.Config.MediaRequirements
 import com.rrvieir4.pickarr.services.clients.*
 import com.rrvieir4.pickarr.services.popular.PopularItem
 import com.rrvieir4.pickarr.services.popular.PopularService
-import com.rrvieir4.pickarr.services.recommendation.RecommendationService
 import com.rrvieir4.pickarr.services.recommendation.models.IRecommendedDetailsItem
 import com.rrvieir4.pickarr.services.storage.DBClient
 
-class PickarrTask(
+class RecommendationTracker(
     private val popularService: PopularService,
-    private val moviesRecommendationService: RecommendationService,
-    private val tvRecommendationService: RecommendationService,
+    private val moviesRecommendationMapperService: RecommendationItemListProvider,
+    private val tvRecommendationMapperService: RecommendationItemListProvider,
     private val dbClient: DBClient,
     private val movieRequirements: MediaRequirements,
     private val tvShowsRequirements: MediaRequirements
 ) {
-    suspend fun getRecommendedMovies(): Response<List<IRecommendedDetailsItem>, PickarrError> {
+    suspend fun getRecommendedMovies(excludeAndUpdatePastRecommendations: Boolean): Response<List<IRecommendedDetailsItem>, PickarrError> {
         return popularService.fetchPopularMovies().rewrap { popularItems ->
-            track(popularItems, movieRequirements, moviesRecommendationService)
+            track(
+                popularItems,
+                movieRequirements,
+                moviesRecommendationMapperService,
+                excludeAndUpdatePastRecommendations
+            )
         }
     }
 
-    suspend fun getRecommendedTVShows(): Response<List<IRecommendedDetailsItem>, PickarrError> {
+    suspend fun getRecommendedTVShows(excludeAndUpdatePastRecommendations: Boolean): Response<List<IRecommendedDetailsItem>, PickarrError> {
         return popularService.fetchPopularTV().rewrap { popularItems ->
-            track(popularItems, tvShowsRequirements, tvRecommendationService)
+            track(popularItems, tvShowsRequirements, tvRecommendationMapperService, excludeAndUpdatePastRecommendations)
         }
     }
 
     private suspend fun track(
         popularItems: List<PopularItem>,
         mediaRequirements: MediaRequirements,
-        recommendationService: RecommendationService
+        recommendationService: RecommendationItemListProvider,
+        excludeAndUpdatePastRecommendations: Boolean
     ): Response<List<IRecommendedDetailsItem>, PickarrError> {
 
-        val existingItemsResponse = recommendationService.getExistingItems()
+        val existingItemsResponse = recommendationService.getLocalRecommendationItems()
         val existingItems = existingItemsResponse.unwrapSuccess() ?: return existingItemsResponse as Response.Failure
 
-        val pastRecommendedItems = dbClient.updateRecommendedItems(existingItems)
+        val pastRecommendedItems = if (excludeAndUpdatePastRecommendations) {
+            dbClient.updateRecommendedItems(existingItems)
+        } else {
+            existingItems
+        }
 
         val relevantPopularItems = popularItems.filter { popularItem ->
             popularItem.year >= mediaRequirements.minYear &&
@@ -48,10 +57,12 @@ class PickarrTask(
                     } == null
         }
 
-        val detailsItemsResponse = recommendationService.getDetailsItems(relevantPopularItems)
+        val detailsItemsResponse = recommendationService.getRecommendationDetailItems(relevantPopularItems)
         val detailsItems = detailsItemsResponse.unwrapSuccess() ?: return detailsItemsResponse
 
-        dbClient.updateRecommendedItems(detailsItems)
+        if (excludeAndUpdatePastRecommendations) {
+            dbClient.updateRecommendedItems(detailsItems)
+        }
 
         val newRecommendedDetailsItemList = detailsItems.filterNot { recommendedItem ->
             mediaRequirements.languageBlacklist.contains(recommendedItem.originalLanguageCode)

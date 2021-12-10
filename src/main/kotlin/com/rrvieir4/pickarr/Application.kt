@@ -2,10 +2,13 @@ package com.rrvieir4.pickarr
 
 import com.rrvieir4.pickarr.config.Config
 import com.rrvieir4.pickarr.plugins.configureRouting
-import com.rrvieir4.pickarr.plugins.launchPickarrTask
+import com.rrvieir4.pickarr.plugins.launchRecommendationsUpdater
+import com.rrvieir4.pickarr.server.TelegramServer
+import com.rrvieir4.pickarr.services.recommendation.RecommendationNotifier
 import io.ktor.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 fun main() {
@@ -18,7 +21,16 @@ fun main() {
             exitProcess(1)
         }
 
+        val recommendationNotifier = RecommendationNotifier(config)
+
         configureRouting(config)
-        launchPickarrTask(config)
+        launchRecommendationsUpdater(config, recommendationNotifier)
+
+        //TODO
+        launch {
+            TelegramServer(config.telegramConfig.telegramUserToken, recommendationNotifier).run()
+        }
+
+
     }.start(wait = true)
 }

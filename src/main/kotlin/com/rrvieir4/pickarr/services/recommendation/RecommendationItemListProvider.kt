@@ -12,15 +12,15 @@ import com.rrvieir4.pickarr.services.tmdb.models.TmdbItem
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
-class RecommendationService(private val tmdbService: TmdbService, private val servarrService: ServarrService<*>) {
+class RecommendationItemListProvider(private val tmdbService: TmdbService, private val servarrService: ServarrService<*>) {
 
-    suspend fun getExistingItems(): Response<List<IRecommendedItem>, PickarrError> {
+    suspend fun getLocalRecommendationItems(): Response<List<IRecommendedItem>, PickarrError> {
         return servarrService.getItems().rewrap { servarrItemList ->
             Response.Success(servarrItemList.mapNotNull { it.toRecommendedItem() })
         }
     }
 
-    suspend fun getDetailsItems(popularItems: List<PopularItem>): Response<List<IRecommendedDetailsItem>, PickarrError> =
+    suspend fun getRecommendationDetailItems(popularItems: List<PopularItem>): Response<List<IRecommendedDetailsItem>, PickarrError> =
         coroutineScope {
             val imdbIdList = popularItems.map { it.id }
             val tmdbItemsDeferred = async { tmdbService.getItems(imdbIdList) }
