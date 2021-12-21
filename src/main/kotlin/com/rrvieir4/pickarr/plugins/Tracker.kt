@@ -1,6 +1,7 @@
 package com.rrvieir4.pickarr.plugins
 
 import com.rrvieir4.pickarr.config.Config
+import com.rrvieir4.pickarr.services.notification.NotificationClient
 import com.rrvieir4.pickarr.services.notification.telegram.TelegramClient
 import com.rrvieir4.pickarr.services.popular.sources.ImdbService
 import com.rrvieir4.pickarr.services.recommendation.RecommendationService
@@ -18,44 +19,13 @@ import io.ktor.client.features.logging.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.ktor.ext.inject
 import java.util.concurrent.TimeUnit
 
-fun Application.launchRecommendationTracker(config: Config) {
-
-    val httpClient = HttpClient(CIO) {
-        install(Logging) {
-            logger = Logger.DEFAULT
-            level = LogLevel.INFO
-        }
-        install(JsonFeature) {
-            serializer = GsonSerializer()
-        }
-    }
-
-    val notificationClient = TelegramClient(
-        config.telegramConfig.telegramUserToken,
-        config.telegramConfig.telegramChatId,
-        config.actionUrlConfig.actionUrl,
-        config.actionUrlConfig.addMovieMethod,
-        config.actionUrlConfig.addTVMethod
-    )
-
-    val popularService = ImdbService(httpClient)
-    val moviesService = RadarrService(config.radarrConfig, httpClient)
-    val tvShowsService = SonarrService(config.sonarrConfig, httpClient)
-    val tmdbService = TmdbService(config.tmdbConfig, httpClient)
-
-    val moviesRecommendationService = RecommendationService(tmdbService, moviesService)
-    val tvRecommendationService = RecommendationService(tmdbService, tvShowsService)
-
-    val recommendationTracker = RecommendationTracker(
-        popularService,
-        moviesRecommendationService,
-        tvRecommendationService,
-        DBClient,
-        config.movieRequirements,
-        config.tvRequirements
-    )
+fun Application.runRecommendationTrackerJob() {
+    val recommendationTracker by inject<RecommendationTracker>()
+    val notificationClient by inject<NotificationClient>()
+    val config by inject<Config>()
 
     launch {
         while (true) {

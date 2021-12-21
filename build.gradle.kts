@@ -5,6 +5,7 @@ val jsoupVersion: String by project
 val kmongoVersion: String by project
 val kapacheCommonsVersion: String by project
 val ktelegrambotVersion: String by project
+val koinVersion: String by project
 
 plugins {
     application
@@ -37,6 +38,9 @@ dependencies {
     implementation("org.litote.kmongo:kmongo-coroutine:$kmongoVersion")
     implementation("org.apache.commons:commons-text:$kapacheCommonsVersion")
     implementation("io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram:$ktelegrambotVersion")
+    implementation("io.insert-koin:koin-ktor:$koinVersion")
+    implementation("io.insert-koin:koin-logger-slf4j:$koinVersion")
+
     testImplementation("io.ktor:ktor-server-tests:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
 }
