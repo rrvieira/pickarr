@@ -9,11 +9,11 @@ import com.rrvieir4.pickarr.services.clients.servarr.sonarr.models.SeriesType
 import com.rrvieir4.pickarr.services.clients.servarr.sonarr.models.TVAddOptions
 import com.rrvieir4.pickarr.services.clients.servarr.sonarr.models.SonarrItem
 import com.rrvieir4.pickarr.services.clients.tvdb.TvdbClient
-import com.rrvieir4.pickarr.services.clients.unwrapSuccess
 import com.rrvieir4.pickarr.services.servarr.ServarrService
+import com.rrvieir4.pickarr.services.utils.unwrapSuccess
 import io.ktor.client.*
 
-class SonarrService(private val config: ServarrConfig, private val httpClient: HttpClient) :
+class SonarrService(private val config: ServarrConfig, httpClient: HttpClient) :
     ServarrService<SonarrItem> {
 
     private val sonarrClient = SonarrClient(config.url, config.apiKey, httpClient)

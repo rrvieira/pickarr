@@ -4,8 +4,8 @@ import com.rrvieir4.pickarr.config.Config
 import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
 import com.rrvieir4.pickarr.services.clients.tmdb.TmdbClient
-import com.rrvieir4.pickarr.services.clients.unwrapSuccess
 import com.rrvieir4.pickarr.services.tmdb.models.TmdbItem
+import com.rrvieir4.pickarr.services.utils.unwrapSuccess
 import io.ktor.client.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async

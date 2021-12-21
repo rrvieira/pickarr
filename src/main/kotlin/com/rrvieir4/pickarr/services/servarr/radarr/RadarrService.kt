@@ -7,8 +7,8 @@ import com.rrvieir4.pickarr.services.clients.servarr.models.Tag
 import com.rrvieir4.pickarr.services.clients.servarr.radarr.RadarrClient
 import com.rrvieir4.pickarr.services.clients.servarr.radarr.models.MovieAddOptions
 import com.rrvieir4.pickarr.services.clients.servarr.radarr.models.RadarrItem
-import com.rrvieir4.pickarr.services.clients.unwrapSuccess
 import com.rrvieir4.pickarr.services.servarr.ServarrService
+import com.rrvieir4.pickarr.services.utils.unwrapSuccess
 import io.ktor.client.*
 
 class RadarrService(private val config: ServarrConfig, httpClient: HttpClient) : ServarrService<RadarrItem> {

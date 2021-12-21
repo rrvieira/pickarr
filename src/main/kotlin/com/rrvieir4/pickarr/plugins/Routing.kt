@@ -1,9 +1,9 @@
 package com.rrvieir4.pickarr.plugins
 
 import com.rrvieir4.pickarr.config.Config
-import com.rrvieir4.pickarr.services.clients.unwrap
 import com.rrvieir4.pickarr.services.servarr.radarr.RadarrService
 import com.rrvieir4.pickarr.services.servarr.sonarr.SonarrService
+import com.rrvieir4.pickarr.services.utils.unwrap
 import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -23,7 +23,7 @@ fun Application.configureRouting(config: Config) {
             val radarrService = RadarrService(config.radarrConfig, httpClient)
 
             radarrService.saveItem(imdbId).unwrap({
-                call.respond(HttpStatusCode.InternalServerError, "Internal server error: ${it.error}")
+                call.respond(HttpStatusCode.InternalServerError, "Internal server error: ${it.message}")
             }, {
                 call.respondRedirect(radarrService.getItemDetailWebpageUrl(it), false)
             })
@@ -38,7 +38,7 @@ fun Application.configureRouting(config: Config) {
             val sonarrService = SonarrService(config.sonarrConfig, httpClient)
 
             sonarrService.saveItem(imdbId).unwrap({
-                call.respond(HttpStatusCode.InternalServerError, "Internal server error: ${it.error}")
+                call.respond(HttpStatusCode.InternalServerError, "Internal server error: ${it.message}")
             }, {
                 call.respondRedirect(sonarrService.getItemDetailWebpageUrl(it), false)
             })

@@ -2,16 +2,13 @@ package com.rrvieir4.pickarr.services.servarr
 
 import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
-import com.rrvieir4.pickarr.services.clients.rewrap
 import com.rrvieir4.pickarr.services.clients.servarr.models.ServarrItem
 import com.rrvieir4.pickarr.services.clients.servarr.models.Tag
-import com.rrvieir4.pickarr.services.clients.unwrapSuccess
+import com.rrvieir4.pickarr.services.utils.rewrap
+import com.rrvieir4.pickarr.services.utils.unwrapSuccess
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 
 interface ServarrService<I : ServarrItem> {
     fun getItemDetailWebpageUrl(item: I): String

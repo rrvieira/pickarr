@@ -2,7 +2,7 @@ package com.rrvieir4.pickarr
 
 import com.rrvieir4.pickarr.config.Config
 import com.rrvieir4.pickarr.plugins.configureRouting
-import com.rrvieir4.pickarr.plugins.launchPickarrTask
+import com.rrvieir4.pickarr.plugins.launchRecommendationTracker
 import io.ktor.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -19,6 +19,6 @@ fun main() {
         }
 
         configureRouting(config)
-        launchPickarrTask(config)
+        launchRecommendationTracker(config)
     }.start(wait = true)
 }

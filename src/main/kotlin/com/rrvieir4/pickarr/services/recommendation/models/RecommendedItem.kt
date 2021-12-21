@@ -3,9 +3,9 @@ package com.rrvieir4.pickarr.services.recommendation.models
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import org.bson.codecs.pojo.annotations.BsonId
 
-data class RecommendedItem(
+data class RecommendedItemImpl(
     @BsonId
-    override val id: String,
+    override val imdbId: String,
     override val title: String,
     override val overview: String,
     override val year: Int,
@@ -18,8 +18,8 @@ data class RecommendedItem(
     override val popularityPosition: Int = 0,
     override val originalLanguageCode: String = "",
     override val castList: List<String> = emptyList()
-) : IRecommendedDetailsItem, Comparable<RecommendedItem> {
-    override fun compareTo(other: RecommendedItem): Int {
+) : RecommendedDetailsItem, Comparable<RecommendedDetailsItem> {
+    override fun compareTo(other: RecommendedDetailsItem): Int {
         return if (rating == other.rating && totalVotes == other.totalVotes) {
             other.popularityPosition.compareTo(popularityPosition)
         } else if (rating == other.rating) {
@@ -30,9 +30,9 @@ data class RecommendedItem(
     }
 }
 
-@JsonDeserialize(`as` = RecommendedItem::class)
-interface IRecommendedItem {
-    val id: String
+@JsonDeserialize(`as` = RecommendedItemImpl::class)
+interface RecommendedItem {
+    val imdbId: String
     val title: String
     val overview: String
     val year: Int
@@ -41,8 +41,8 @@ interface IRecommendedItem {
     val from: String
 }
 
-@JsonDeserialize(`as` = RecommendedItem::class)
-interface IRecommendedDetailsItem : IRecommendedItem {
+@JsonDeserialize(`as` = RecommendedItemImpl::class)
+interface RecommendedDetailsItem : RecommendedItem {
     val link: String
     val rating: Float
     val totalVotes: Int

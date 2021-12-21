@@ -1,17 +1,15 @@
 package com.rrvieir4.pickarr.plugins
 
 import com.rrvieir4.pickarr.config.Config
-import com.rrvieir4.pickarr.services.clients.PickarrError
-import com.rrvieir4.pickarr.services.clients.Response
-import com.rrvieir4.pickarr.services.notification.NotificationClient
 import com.rrvieir4.pickarr.services.notification.telegram.TelegramClient
 import com.rrvieir4.pickarr.services.popular.sources.ImdbService
 import com.rrvieir4.pickarr.services.recommendation.RecommendationService
-import com.rrvieir4.pickarr.services.tmdb.TmdbService
 import com.rrvieir4.pickarr.services.servarr.radarr.RadarrService
 import com.rrvieir4.pickarr.services.servarr.sonarr.SonarrService
 import com.rrvieir4.pickarr.services.storage.DBClient
-import com.rrvieir4.pickarr.task.PickarrTask
+import com.rrvieir4.pickarr.services.tmdb.TmdbService
+import com.rrvieir4.pickarr.services.utils.unwrap
+import com.rrvieir4.pickarr.task.RecommendationTracker
 import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -22,7 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
-fun Application.launchPickarrTask(config: Config) {
+fun Application.launchRecommendationTracker(config: Config) {
 
     val httpClient = HttpClient(CIO) {
         install(Logging) {
@@ -50,7 +48,7 @@ fun Application.launchPickarrTask(config: Config) {
     val moviesRecommendationService = RecommendationService(tmdbService, moviesService)
     val tvRecommendationService = RecommendationService(tmdbService, tvShowsService)
 
-    val pickarrTask = PickarrTask(
+    val recommendationTracker = RecommendationTracker(
         popularService,
         moviesRecommendationService,
         tvRecommendationService,
@@ -61,38 +59,32 @@ fun Application.launchPickarrTask(config: Config) {
 
     launch {
         while (true) {
-            val trackMoviesDeferred = async {
-                pickarrTask.getRecommendedMovies()
+            val recommendedMoviesDeferred = async {
+                recommendationTracker.getRecommendedMovies()
             }
-            val trackTVShowsDeferred = async {
-                pickarrTask.getRecommendedTVShows()
+            val recommendedTVShowsDeferred = async {
+                recommendationTracker.getRecommendedTVShows()
             }
 
-            val trackMoviesResponse = trackMoviesDeferred.await()
-            val trackTVShowsResponse = trackTVShowsDeferred.await()
-            val trackResponses = listOf(trackMoviesResponse, trackTVShowsResponse)
+            val (recommendedMovies, trackMoviesError) = recommendedMoviesDeferred.await().unwrap()
+            val (recommendedTVShows, trackTVShowsError) = recommendedTVShowsDeferred.await().unwrap()
+            val errorsList = listOf(trackMoviesError, trackTVShowsError)
 
-            val refreshInterval = if (trackResponses.filterIsInstance<Response.Failure<PickarrError>>().onEach {
-                    it.notifyError(notificationClient)
+            val refreshInterval = if (errorsList.filterNotNull().onEach {
+                    notificationClient.notifyTaskError(it::class.simpleName, it.message)
                 }.isNotEmpty()) {
                 config.refreshInterval.retry
             } else {
-                (trackMoviesResponse as? Response.Success)?.let {
-                    notificationClient.notifyNewMovies(it.body)
+                recommendedMovies?.let {
+                    notificationClient.notifyNewMovies(it)
                 }
-                (trackTVShowsResponse as? Response.Success)?.let {
-                    notificationClient.notifyNewTV(it.body)
+                recommendedTVShows?.let {
+                    notificationClient.notifyNewTV(it)
                 }
                 config.refreshInterval.default
             }
 
             delay(TimeUnit.SECONDS.toMillis(refreshInterval))
         }
-    }
-}
-
-private suspend fun Response<*, PickarrError>.notifyError(notificationClient: NotificationClient) {
-    (this as? Response.Failure)?.let {
-        notificationClient.notifyTaskError(this.body::class.simpleName, this.body.error)
     }
 }

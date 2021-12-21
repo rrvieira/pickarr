@@ -3,7 +3,7 @@ package com.rrvieir4.pickarr.services.clients.tvdb
 import com.rrvieir4.pickarr.services.clients.PickarrError
 import com.rrvieir4.pickarr.services.clients.Response
 import com.rrvieir4.pickarr.services.clients.pickarrGet
-import com.rrvieir4.pickarr.services.clients.rewrap
+import com.rrvieir4.pickarr.services.utils.rewrap
 import io.ktor.client.*
 
 class TvdbClient(private val httpClient: HttpClient) {
