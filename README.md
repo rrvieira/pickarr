@@ -6,7 +6,9 @@ Pickar is a service (distributed in a docker image) that keeps an eye on trendin
 - Synopsis
 - IMDb rating and number of votes
 - Popularity ranking
+- Original language
 - Genres
+- Most popular actors
 - Poster image
 
 and provides the following actions:
@@ -15,11 +17,10 @@ and provides the following actions:
 
 ### Recommendation Messages - Demo
 
-<p float="left">
-  <img width=310 src="https://user-images.githubusercontent.com/3785821/138491362-41981e8a-c129-4eab-af63-d2e18b15fd76.png">
-  <img width=310 src="https://user-images.githubusercontent.com/3785821/138491380-70201e81-7015-4b87-8df3-d4dd6265b54c.png">
+<p float="left">  
+  <img width="310" alt="demo-movies" src="https://user-images.githubusercontent.com/3785821/147132637-f5e919bc-857b-4fbd-9ca2-55bbe149210a.png">
+  <img width="310" alt="demo-tv" src="https://user-images.githubusercontent.com/3785821/147132753-651a3a72-1c04-45e5-afbc-2bba7c9da818.png">
 </p>
-
 
 # Usage
 
@@ -49,12 +50,14 @@ pickarr:
     - SONARR_URL=http://127.0.0.1:8989
     - SONARR_API_KEY=<your sonarr api key>
     - SONARR_QUALITY_PROFILE_NAME=Ultra-HD
+    - TMDB_API_KEY=<your tmdb api key>
     - MOVIE_MIN_YEAR=2021
     - MOVIE_MIN_VOTES=3000
     - MOVIE_MIN_RATING=5.7
     - TV_SHOW_MIN_YEAR=2021
     - TV_SHOW_MIN_VOTES=3000
     - TV_SHOW_MIN_RATING=7.5
+    - LANGUAGE_BLACKLIST=hi,ta,te
     - TAG_NAME=pickarr
     - REFRESH_INTERVAL=86400
     - ACTION_ADDRESS=http://127.0.0.1:7877
@@ -83,12 +86,14 @@ docker run -d \
   -e SONARR_URL='http://127.0.0.1:8989' \
   -e SONARR_API_KEY=<your sonarr api key> \
   -e SONARR_QUALITY_PROFILE_NAME=Ultra-HD \
+  -e TMDB_API_KEY=<your tmdb api key> \
   -e MOVIE_MIN_YEAR=2021 \
   -e MOVIE_MIN_VOTES=3000 \
   -e MOVIE_MIN_RATING=5.7 \
   -e TV_SHOW_MIN_YEAR=2021 \
   -e TV_SHOW_MIN_VOTES=3000 \
   -e TV_SHOW_MIN_RATING=7.5 \
+  -e LANGUAGE_BLACKLIST='hi,ta,te' \
   -e TAG_NAME=pickarr \
   -e REFRESH_INTERVAL=86400 \
   -e ACTION_ADDRESS='http://127.0.0.1:7877' \
@@ -110,6 +115,7 @@ RADARR_QUALITY_PROFILE_NAME | No | N/A | Radarr quality profile name (case-sensi
 SONARR_URL | No | N/A | Sonarr address
 SONARR_API_KEY | No | N/A | Sonarr API Key
 SONARR_QUALITY_PROFILE_NAME | No | N/A | Sonarr quality profile name (case-sensitive) for the tvshows added by pickarr
+TMDB_API_KEY | No | N/A | [TMDb](https://www.themoviedb.org/) API Key
 DEFAULT_TAG_NAME | Yes | pickarr | Tag name for the movies/tvshows added by pickarr
 REFRESH_INTERVAL | Yes | 86400 | Popular list refresh interval (in seconds)
 ACTION_ADDRESS | No | N/A | pickarr address
@@ -121,4 +127,5 @@ MOVIE_MIN_RATING | Yes | 5.7 | Movie's minimum rating to be eligible for recomme
 TV_SHOW_MIN_YEAR | Yes | 2021 | Tvshow's minimum release year to be eligible for recommendation
 TV_SHOW_MIN_VOTES | Yes | 3000 | Tvshow's minimum number of votes to be eligible for recommendation
 TV_SHOW_MIN_RATING | Yes | 7.5 | Tvshow's minimum release year to be eligible for recommendation
+LANGUAGE_BLACKLIST | Yes | _empty_ | Movies/TV Shows with an original language contained in this list are not recommended. This list consists in a [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) two-letter language code separated by comma (e.g: _hi,ta,te_)
 
