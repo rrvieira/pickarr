@@ -1,6 +1,6 @@
 # pickarr
 
-Pickar is a service (distributed in a docker image) that keeps an eye on trending movies/tvshows on [IMDb](https://www.imdb.com/) and recommend the ones that might be of interest, according to some user defined criteria. The recommendations are sent via [Telegram](https://telegram.org/) messages. For each movie/tvshow recommendation it includes some related data:
+Pickarr is a service (distributed in a docker image) that keeps an eye on trending movies/tvshows on [IMDb](https://www.imdb.com/) and recommend the ones that might be of interest, according to some user defined criteria. The recommendations are sent via [Telegram](https://telegram.org/) messages. For each movie/tvshow recommendation it includes some related data:
 - Title and year of release;
 - Studio/network
 - Synopsis
