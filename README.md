@@ -107,25 +107,25 @@ docker run -d \
 
 ### Parameters
 
-Name | Optional? | Default | Description
------------- | ------------- | ------------- | -------------
-RADARR_URL | No | N/A | Radarr address
-RADARR_API_KEY | No | N/A | Radarr API Key
-RADARR_QUALITY_PROFILE_NAME | No | N/A | Radarr quality profile name (case-sensitive) for the movies added by pickarr
-SONARR_URL | No | N/A | Sonarr address
-SONARR_API_KEY | No | N/A | Sonarr API Key
-SONARR_QUALITY_PROFILE_NAME | No | N/A | Sonarr quality profile name (case-sensitive) for the tvshows added by pickarr
-TMDB_API_KEY | No | N/A | [TMDb](https://www.themoviedb.org/) API Key
-DEFAULT_TAG_NAME | Yes | pickarr | Tag name for the movies/tvshows added by pickarr
-REFRESH_INTERVAL | Yes | 86400 | Popular list refresh interval (in seconds)
-ACTION_ADDRESS | No | N/A | pickarr address
-TELEGRAM_USER_TOKEN | No | N/A | Your telegram user token
-TELEGRAM_CHAT_ID | No | N/A | Your telegram chat id
-MOVIE_MIN_YEAR | Yes | 2021 | Movie's minimum release year to be eligible for recommendation
-MOVIE_MIN_VOTES | Yes | 3000 | Movie's minimum number of votes to be eligible for recommendation
-MOVIE_MIN_RATING | Yes | 5.7 | Movie's minimum rating to be eligible for recommendation
-TV_SHOW_MIN_YEAR | Yes | 2021 | Tvshow's minimum release year to be eligible for recommendation
-TV_SHOW_MIN_VOTES | Yes | 3000 | Tvshow's minimum number of votes to be eligible for recommendation
-TV_SHOW_MIN_RATING | Yes | 7.5 | Tvshow's minimum release year to be eligible for recommendation
-LANGUAGE_BLACKLIST | Yes | _empty_ | Movies/TV Shows with an original language contained in this list are not recommended. This list consists in a [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) two-letter language code separated by comma (e.g: _hi,ta,te_)
+| Name                        | Optional? | Default | Description                                                                                                                                                                                                                                    |
+|-----------------------------|-----------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| RADARR_URL                  | No        | N/A     | Radarr address                                                                                                                                                                                                                                 |
+| RADARR_API_KEY              | No        | N/A     | Radarr API Key                                                                                                                                                                                                                                 |
+| RADARR_QUALITY_PROFILE_NAME | No        | N/A     | Radarr quality profile name (case-sensitive) for the movies added by pickarr                                                                                                                                                                   |
+| SONARR_URL                  | No        | N/A     | Sonarr address                                                                                                                                                                                                                                 |
+| SONARR_API_KEY              | No        | N/A     | Sonarr API Key                                                                                                                                                                                                                                 |
+| SONARR_QUALITY_PROFILE_NAME | No        | N/A     | Sonarr quality profile name (case-sensitive) for the tvshows added by pickarr                                                                                                                                                                  |
+| TMDB_API_KEY                | No        | N/A     | [TMDb](https://www.themoviedb.org/) API Key                                                                                                                                                                                                    |
+| DEFAULT_TAG_NAME            | Yes       | pickarr | Tag name for the movies/tvshows added by pickarr                                                                                                                                                                                               |
+| REFRESH_INTERVAL            | Yes       | 86400   | Popular list refresh interval (in seconds)                                                                                                                                                                                                     |
+| ACTION_ADDRESS              | No        | N/A     | pickarr address                                                                                                                                                                                                                                |
+| TELEGRAM_USER_TOKEN         | No        | N/A     | Your telegram user token                                                                                                                                                                                                                       |
+| TELEGRAM_CHAT_ID            | No        | N/A     | Your telegram chat id                                                                                                                                                                                                                          |
+| MOVIE_MIN_YEAR              | Yes       | 2021    | Movie's minimum release year to be eligible for recommendation                                                                                                                                                                                 |
+| MOVIE_MIN_VOTES             | Yes       | 3000    | Movie's minimum number of votes to be eligible for recommendation                                                                                                                                                                              |
+| MOVIE_MIN_RATING            | Yes       | 5.7     | Movie's minimum rating to be eligible for recommendation                                                                                                                                                                                       |
+| TV_SHOW_MIN_YEAR            | Yes       | 2021    | Tvshow's minimum release year to be eligible for recommendation                                                                                                                                                                                |
+| TV_SHOW_MIN_VOTES           | Yes       | 3000    | Tvshow's minimum number of votes to be eligible for recommendation                                                                                                                                                                             |
+| TV_SHOW_MIN_RATING          | Yes       | 7.5     | Tvshow's minimum release year to be eligible for recommendation                                                                                                                                                                                |
+| LANGUAGE_BLACKLIST          | Yes       | _empty_ | Movies/TV Shows with an original language contained in this list are not recommended. This list consists in a [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) two-letter language code separated by comma (e.g: _hi,ta,te_) |
 
