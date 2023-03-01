@@ -52,10 +52,6 @@ class TmdbService(
                 }
             }
 
-            if (imdbIdList.isNotEmpty() && itemsMap.isEmpty()) {
-                Response.Failure(PickarrError.ApiError("${this::class.simpleName}: Could not retrieve any tmdb details."))
-            } else {
-                Response.Success(itemsMap)
-            }
+            Response.Success(itemsMap)
         }
 }
